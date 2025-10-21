@@ -1,0 +1,503 @@
+/* App Component - Modern Design System */
+@import './styles/design-tokens.css';
+
+.app-wrapper {
+  font-family: var(--font-family-primary);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--background);
+  position: relative;
+  overflow-x: hidden;
+}
+
+.app-wrapper * {
+  box-sizing: border-box;
+}
+
+/* App Container */
+.App {
+  text-align: center;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* App Logo */
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+/* App Header */
+.App-header {
+  background: linear-gradient(135deg, var(--gray-900) 0%, var(--gray-800) 100%);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+  padding: var(--space-8);
+}
+
+.App-link {
+  color: var(--primary-400);
+  font-weight: var(--font-medium);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.App-link:hover {
+  color: var(--primary-300);
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Legacy Header and Footer Styles (Scoped) */
+.app-wrapper .header, .app-wrapper .footer {
+  background: white;
+  color: var(--gray-900);
+  padding: var(--space-4) var(--space-6);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--gray-200);
+  box-shadow: var(--shadow-sm);
+}
+
+.app-wrapper .header nav a {
+  color: var(--gray-700);
+  margin: 0 var(--space-3);
+  text-decoration: none;
+  font-weight: var(--font-medium);
+  font-size: var(--text-sm);
+  transition: color var(--transition-fast);
+}
+
+.app-wrapper .header nav a:hover {
+  color: var(--primary-600);
+}
+
+.app-wrapper .footer {
+  background: var(--gray-900);
+  color: var(--gray-300);
+  text-align: center;
+  border-top: 1px solid var(--gray-700);
+  border-bottom: none;
+  margin-top: auto;
+}
+
+/* Global Utility Classes */
+.app-wrapper .container {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: 0 var(--space-6);
+}
+
+.app-wrapper .section {
+  padding: var(--space-12) 0;
+}
+
+.app-wrapper .card {
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-6);
+  transition: all var(--transition-fast);
+}
+
+.app-wrapper .card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--gray-300);
+}
+
+.app-wrapper .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  font-family: var(--font-family-primary);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  line-height: 1.5;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.app-wrapper .btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.app-wrapper .btn-primary {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: var(--radius-button);
+}
+
+.app-wrapper .btn-primary:hover {
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+}
+
+.app-wrapper .btn-secondary {
+  background: white;
+  color: var(--gray-700);
+  border-color: var(--gray-300);
+}
+
+.app-wrapper .btn-secondary:hover {
+  background: var(--gray-50);
+  border-color: var(--gray-400);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.app-wrapper .btn-success {
+  background: var(--success);
+  color: white;
+  border-color: var(--success);
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: var(--radius-button);
+}
+
+.app-wrapper .btn-success:hover {
+  background: var(--success-hover);
+  border-color: var(--success-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+}
+
+.app-wrapper .btn-danger {
+  background: var(--danger);
+  color: white;
+  border-color: var(--danger);
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: var(--radius-button);
+}
+
+.app-wrapper .btn-danger:hover {
+  background: var(--danger-hover);
+  border-color: var(--danger-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Form Elements */
+.app-wrapper .form-group {
+  margin-bottom: var(--space-4);
+}
+
+.app-wrapper .form-label {
+  display: block;
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--gray-700);
+  margin-bottom: var(--space-2);
+}
+
+.app-wrapper .form-input {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  font-family: var(--font-family-primary);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--gray-900);
+  background: white;
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+}
+
+.app-wrapper .form-input:focus {
+  outline: none;
+  border-color: var(--primary-500);
+  box-shadow: 0 0 0 3px rgb(59 130 246 / 0.1);
+}
+
+.app-wrapper .form-input::placeholder {
+  color: var(--gray-400);
+}
+
+/* Typography */
+.app-wrapper h1 {
+  font-size: var(--text-4xl);
+  font-weight: var(--font-bold);
+  color: var(--gray-900);
+  line-height: 1.2;
+  margin-bottom: var(--space-6);
+}
+
+.app-wrapper h2 {
+  font-size: var(--text-3xl);
+  font-weight: var(--font-bold);
+  color: var(--gray-900);
+  line-height: 1.3;
+  margin-bottom: var(--space-5);
+}
+
+.app-wrapper h3 {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-semibold);
+  color: var(--gray-900);
+  line-height: 1.4;
+  margin-bottom: var(--space-4);
+}
+
+.app-wrapper h4 {
+  font-size: var(--text-xl);
+  font-weight: var(--font-semibold);
+  color: var(--gray-900);
+  line-height: 1.4;
+  margin-bottom: var(--space-3);
+}
+
+.app-wrapper p {
+  font-size: var(--text-base);
+  color: var(--gray-600);
+  line-height: 1.6;
+  margin-bottom: var(--space-4);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .app-wrapper .container {
+    padding: 0 var(--space-4);
+  }
+  
+  .app-wrapper .section {
+    padding: var(--space-8) 0;
+  }
+  
+  .app-wrapper h1 {
+    font-size: var(--text-3xl);
+  }
+  
+  .app-wrapper h2 {
+    font-size: var(--text-2xl);
+  }
+  
+  .app-wrapper h3 {
+    font-size: var(--text-xl);
+  }
+}
+
+@media (max-width: 480px) {
+  .app-wrapper .container {
+    padding: 0 var(--space-3);
+  }
+  
+  .app-wrapper .card {
+    padding: var(--space-4);
+  }
+  
+  .app-wrapper .btn {
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-xs);
+  }
+}/* E
+nhanced Global Responsive Design */
+
+/* Extra Large Screens (1536px and up) */
+@media (min-width: 1536px) {
+  .app-wrapper .container {
+    max-width: 1536px;
+    padding: 0 var(--space-8);
+  }
+  
+  .app-wrapper .section {
+    padding: var(--space-20) 0;
+  }
+}
+
+/* Large Screens (1024px to 1535px) */
+@media (min-width: 1024px) and (max-width: 1535px) {
+  .app-wrapper .container {
+    padding: 0 var(--space-6);
+  }
+  
+  .app-wrapper .section {
+    padding: var(--space-16) 0;
+  }
+}
+
+/* Medium Screens (768px to 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .app-wrapper .container {
+    padding: 0 var(--space-5);
+  }
+  
+  .app-wrapper .section {
+    padding: var(--space-12) 0;
+  }
+  
+  .app-wrapper .card {
+    padding: var(--space-5);
+  }
+  
+  .app-wrapper .btn {
+    padding: var(--space-2) var(--space-3);
+    font-size: 14px;
+  }
+}
+
+/* Small Screens (480px to 767px) */
+@media (min-width: 480px) and (max-width: 767px) {
+  .app-wrapper .container {
+    padding: 0 var(--space-4);
+  }
+  
+  .app-wrapper .section {
+    padding: var(--space-10) 0;
+  }
+  
+  .app-wrapper .card {
+    padding: var(--space-4);
+  }
+  
+  .app-wrapper .btn {
+    padding: var(--space-2);
+    font-size: 13px;
+  }
+  
+  .app-wrapper h1 {
+    font-size: var(--text-2xl);
+  }
+  
+  .app-wrapper h2 {
+    font-size: var(--text-xl);
+  }
+  
+  .app-wrapper h3 {
+    font-size: var(--text-lg);
+  }
+}
+
+/* Extra Small Screens (320px to 479px) */
+@media (max-width: 479px) {
+  .app-wrapper .container {
+    padding: 0 var(--space-3);
+  }
+  
+  .app-wrapper .section {
+    padding: var(--space-8) 0;
+  }
+  
+  .app-wrapper .card {
+    padding: var(--space-3);
+  }
+  
+  .app-wrapper .btn {
+    padding: var(--space-1) var(--space-2);
+    font-size: 12px;
+  }
+  
+  .app-wrapper h1 {
+    font-size: var(--text-xl);
+  }
+  
+  .app-wrapper h2 {
+    font-size: var(--text-lg);
+  }
+  
+  .app-wrapper h3 {
+    font-size: var(--text-base);
+  }
+  
+  .app-wrapper h4 {
+    font-size: var(--text-sm);
+  }
+}
+
+/* Responsive Form Elements */
+@media (max-width: 768px) {
+  .app-wrapper .form-input {
+    padding: var(--space-2) var(--space-3);
+    font-size: 14px;
+  }
+  
+  .app-wrapper .form-label {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-wrapper .form-input {
+    padding: var(--space-1) var(--space-2);
+    font-size: 13px;
+  }
+  
+  .app-wrapper .form-label {
+    font-size: 12px;
+  }
+}
+
+/* Responsive Navigation */
+@media (max-width: 768px) {
+  .app-wrapper .header nav {
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  
+  .app-wrapper .header nav a {
+    padding: var(--space-2);
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-wrapper .header {
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-3);
+  }
+  
+  .app-wrapper .header nav a {
+    padding: var(--space-1);
+    font-size: 13px;
+  }
+}
+
+/* Responsive Footer */
+@media (max-width: 768px) {
+  .app-wrapper .footer {
+    padding: var(--space-4);
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-wrapper .footer {
+    padding: var(--space-3);
+    font-size: 13px;
+  }
+}

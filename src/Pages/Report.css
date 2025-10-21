@@ -1,0 +1,339 @@
+/* Report Component - Professional Filter Styling */
+@import '../styles/design-tokens.css';
+
+/* Report Page Specific Styling */
+.admin-dashboard-wrapper .tasks-wrapper {
+  background: var(--card-bg);
+  border-radius: var(--radius-card);
+  padding: var(--space-6);
+  box-shadow: var(--card-shadow);
+  border: 1px solid var(--border-gray);
+  margin: var(--space-6) 0;
+}
+
+/* Filter Container Styling */
+.admin-dashboard-wrapper .filters {
+  margin-bottom: var(--space-6);
+}
+
+.admin-dashboard-wrapper .filters > div {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  align-items: center;
+  padding: 20px;
+  background: var(--card-bg);
+  border-radius: var(--radius-card);
+  box-shadow: var(--card-shadow);
+  border: 1px solid var(--border-gray);
+}
+
+/* Filter Label */
+.admin-dashboard-wrapper .filters::before {
+  content: "Apply Filters";
+  display: block;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 12px;
+  padding-left: 4px;
+}
+
+/* Filter Select Dropdowns - Blue Border */
+.admin-dashboard-wrapper .filters select {
+  padding: 10px 14px;
+  border: 2px solid var(--primary);
+  border-radius: var(--radius-button);
+  background: var(--card-bg);
+  color: var(--text-dark);
+  font-size: 15px;
+  font-weight: 500;
+  min-width: 150px;
+  transition: all var(--transition-normal);
+  cursor: pointer;
+  box-shadow: var(--card-shadow);
+}
+
+.admin-dashboard-wrapper .filters select:focus {
+  outline: none;
+  border-color: var(--primary-hover);
+  box-shadow: 0 0 0 3px rgba(59, 134, 209, 0.15);
+  background: var(--card-bg);
+}
+
+.admin-dashboard-wrapper .filters select:hover {
+  border-color: var(--primary-hover);
+  background: var(--card-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Filter Date Inputs - Blue Border */
+.admin-dashboard-wrapper .filters input[type="date"] {
+  padding: 10px 14px;
+  border: 2px solid var(--primary);
+  border-radius: var(--radius-button);
+  background: var(--card-bg);
+  color: var(--text-dark);
+  font-size: 15px;
+  font-weight: 500;
+  transition: all var(--transition-normal);
+  cursor: pointer;
+  box-shadow: var(--card-shadow);
+  min-width: 140px;
+}
+
+.admin-dashboard-wrapper .filters input[type="date"]:focus {
+  outline: none;
+  border-color: var(--primary-hover);
+  box-shadow: 0 0 0 3px rgba(59, 134, 209, 0.15);
+  background: var(--card-bg);
+}
+
+.admin-dashboard-wrapper .filters input[type="date"]:hover {
+  border-color: var(--primary-hover);
+  background: var(--card-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Filter Search Input - Blue Border */
+.admin-dashboard-wrapper .filters input[type="text"] {
+  padding: 10px 14px;
+  border: 2px solid var(--primary);
+  border-radius: var(--radius-button);
+  background: var(--card-bg);
+  color: var(--text-dark);
+  font-size: 15px;
+  font-weight: 500;
+  min-width: 220px;
+  transition: all var(--transition-normal);
+  box-shadow: var(--card-shadow);
+}
+
+.admin-dashboard-wrapper .filters input[type="text"]:focus {
+  outline: none;
+  border-color: var(--primary-hover);
+  box-shadow: 0 0 0 3px rgba(59, 134, 209, 0.15);
+  background: var(--card-bg);
+}
+
+.admin-dashboard-wrapper .filters input[type="text"]:hover {
+  border-color: var(--primary-hover);
+  background: var(--card-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+}
+
+.admin-dashboard-wrapper .filters input[type="text"]::placeholder {
+  color: var(--text-gray);
+  font-weight: 400;
+}
+
+/* Clear Filter Button - Blue Background */
+.admin-dashboard-wrapper .filters button {
+  padding: 10px 20px;
+  background: var(--primary);
+  color: white;
+  border: 2px solid var(--primary);
+  border-radius: var(--radius-button);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  box-shadow: var(--card-shadow);
+  min-width: 100px;
+}
+
+.admin-dashboard-wrapper .filters button:hover {
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.admin-dashboard-wrapper .filters button:active {
+  transform: translateY(0);
+  box-shadow: var(--card-shadow);
+}
+
+/* Enhanced Back Button with Background Color */
+.admin-dashboard-wrapper .back-btn {
+  padding: 12px 20px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+  color: white;
+  border: 2px solid var(--primary);
+  border-radius: var(--radius-button);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  box-shadow: var(--shadow-md);
+}
+
+.admin-dashboard-wrapper .back-btn:hover {
+  background: linear-gradient(135deg, var(--primary-hover) 0%, var(--primary-dark) 100%);
+  border-color: var(--primary-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.admin-dashboard-wrapper .download-btn {
+  padding: 12px 20px;
+  background: linear-gradient(135deg, var(--success) 0%, var(--success-hover) 100%) !important;
+  color: white;
+  border: 2px solid var(--success);
+  border-radius: var(--radius-button);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  box-shadow: var(--shadow-md);
+}
+
+.admin-dashboard-wrapper .download-btn:hover {
+  background: linear-gradient(135deg, var(--success-hover) 0%, var(--success-700) 100%) !important;
+  border-color: var(--success-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Table Header Styling - Back Button Only */
+.admin-dashboard-wrapper .table-header {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-bottom: var(--space-6);
+  padding: 16px 20px;
+  background: var(--card-bg);
+  border-radius: var(--radius-card);
+  box-shadow: var(--card-shadow);
+  border: 1px solid var(--border-gray);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .admin-dashboard-wrapper .filters > div {
+    gap: 10px;
+    padding: 16px;
+  }
+  
+  .admin-dashboard-wrapper .filters select,
+  .admin-dashboard-wrapper .filters input[type="date"],
+  .admin-dashboard-wrapper .filters input[type="text"],
+  .admin-dashboard-wrapper .filters button {
+    min-width: 120px;
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+  
+  .admin-dashboard-wrapper .table-header {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-dashboard-wrapper .filters > div {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  
+  .admin-dashboard-wrapper .filters select,
+  .admin-dashboard-wrapper .filters input[type="date"],
+  .admin-dashboard-wrapper .filters input[type="text"],
+  .admin-dashboard-wrapper .filters button {
+    width: 100%;
+    min-width: auto;
+  }
+}/*
+ Task Header Styling for Report Page */
+.admin-dashboard-wrapper .task-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-6);
+  padding: 16px 20px;
+  background: var(--card-bg);
+  border-radius: var(--radius-card);
+  box-shadow: var(--card-shadow);
+  border: 1px solid var(--border-gray);
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.admin-dashboard-wrapper .task-title {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-bold);
+  color: var(--text-dark);
+  margin: 0;
+  flex: 1;
+  min-width: 200px;
+}
+
+.admin-dashboard-wrapper .download-excel-btn {
+  padding: 10px 20px;
+  background: var(--success);
+  color: white;
+  border: 2px solid var(--success);
+  border-radius: var(--radius-button);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  box-shadow: var(--card-shadow);
+  white-space: nowrap;
+  min-width: 140px;
+}
+
+.admin-dashboard-wrapper .download-excel-btn:hover {
+  background: var(--success-hover);
+  border-color: var(--success-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.admin-dashboard-wrapper .download-excel-btn:active {
+  transform: translateY(0);
+  box-shadow: var(--card-shadow);
+}
+
+/* Enhanced Responsive Design for Report Page */
+@media (max-width: 768px) {
+  .admin-dashboard-wrapper .task-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 16px;
+  }
+  
+  .admin-dashboard-wrapper .task-title {
+    text-align: center;
+    min-width: auto;
+    font-size: var(--text-xl);
+  }
+  
+  .admin-dashboard-wrapper .download-excel-btn {
+    width: 100%;
+    min-width: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-dashboard-wrapper .task-header {
+    padding: 12px;
+    gap: 10px;
+  }
+  
+  .admin-dashboard-wrapper .task-title {
+    font-size: var(--text-lg);
+  }
+  
+  .admin-dashboard-wrapper .download-excel-btn {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+}

@@ -1,0 +1,291 @@
+/* Header Component - Modern Design */
+@import '../styles/design-tokens.css';
+
+.header-wrapper {
+  font-family: var(--font-family-primary);
+}
+
+.header-wrapper * {
+  box-sizing: border-box;
+}
+
+/* Main Header - Bold Modern */
+.header-wrapper .main-header {
+  background: var(--header-bg);
+  background: linear-gradient(135deg, var(--header-bg) 0%, rgba(30, 41, 59, 0.95) 100%);
+  backdrop-filter: var(--backdrop-blur);
+  border-bottom: 1px solid rgba(79, 70, 229, 0.2);
+  box-shadow: var(--shadow-xl), var(--shadow-glow);
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+}
+
+.header-wrapper .header-content {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-4) var(--space-6);
+  height: var(--header-height);
+}
+
+/* Logo Section */
+.header-wrapper .logo-section {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.header-wrapper .logos {
+  display: flex;
+  align-items: center;
+}
+
+.header-wrapper .company-logoo {
+  height: 2.5rem;
+  width: auto;
+  border-radius: var(--radius-sm);
+}
+
+.header-wrapper .company-names {
+  font-size: var(--text-xl);
+  font-weight: var(--font-bold);
+  color: var(--text);
+  white-space: nowrap;
+  margin-left: var(--space-3);
+}
+
+/* Company Info */
+.header-wrapper .company-info h1 {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-bold);
+  color: var(--gray-900);
+  margin-bottom: var(--space-1);
+}
+
+.header-wrapper .company-info p {
+  font-size: var(--text-sm);
+  color: var(--gray-600);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: var(--font-medium);
+}
+
+/* Navigation */
+.header-wrapper .header-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+.header-wrapper .nav-links {
+  display: flex;
+  gap: var(--space-6);
+}
+
+.header-wrapper .nav-links a {
+  color: var(--gray-700);
+  text-decoration: none;
+  font-weight: var(--font-medium);
+  font-size: var(--text-sm);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+  position: relative;
+}
+
+.header-wrapper .nav-links a:hover {
+  color: var(--primary);
+  background: var(--primary-50);
+}
+
+.header-wrapper .nav-links a.active {
+  color: var(--primary);
+  background: var(--primary-50);
+}
+
+.header-wrapper .nav-links a.active::after {
+  content: '';
+  position: absolute;
+  bottom: -var(--space-4);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  height: 2px;
+  background: var(--primary);
+  border-radius: var(--radius-sm);
+}
+
+/* User Section */
+.header-wrapper .user-section {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.header-wrapper .user-info {
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-lg);
+  font-weight: var(--font-medium);
+  font-size: var(--text-sm);
+  color: var(--gray-700);
+}
+
+/* Header Buttons */
+.header-wrapper .header-buttons {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.header-wrapper .btn-header {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background: white;
+  color: var(--gray-700);
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  text-decoration: none;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-sm);
+}
+
+.header-wrapper .btn-header:hover {
+  background: var(--gray-50);
+  border-color: var(--gray-400);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.header-wrapper .btn-primary {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+  color: white;
+  border-color: var(--primary);
+}
+
+.header-wrapper .btn-primary:hover {
+  background: linear-gradient(135deg, var(--primary-hover) 0%, var(--primary-dark) 100%);
+  border-color: var(--primary-hover);
+}
+
+/* Headers and Footers (Legacy) */
+.header-wrapper .headers,
+.header-wrapper .footers {
+  background: var(--primary-700);
+  color: white;
+  padding: var(--space-4) var(--space-5);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-wrapper .headers nav a {
+  color: white;
+  margin: 0 var(--space-3);
+  text-decoration: none;
+  font-weight: var(--font-medium);
+  transition: color var(--transition-fast);
+}
+
+.header-wrapper .headers nav a:hover {
+  color: var(--primary-200);
+}
+
+/* Demo Content */
+.header-wrapper .demo-content {
+  padding: var(--space-10) var(--space-5);
+  text-align: center;
+  max-width: 50rem;
+  margin: 0 auto;
+}
+
+.header-wrapper .demo-content h2 {
+  font-size: var(--text-3xl);
+  font-weight: var(--font-bold);
+  color: var(--gray-900);
+  margin-bottom: var(--space-5);
+}
+
+.header-wrapper .demo-content p {
+  font-size: var(--text-lg);
+  color: var(--gray-600);
+  line-height: 1.6;
+  margin-bottom: var(--space-5);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .header-wrapper .header-content {
+    padding: var(--space-3) var(--space-4);
+  }
+  
+  .header-wrapper .company-names {
+    font-size: var(--text-lg);
+  }
+  
+  .header-wrapper .nav-links {
+    gap: var(--space-4);
+  }
+}
+
+@media (max-width: 768px) {
+  .header-wrapper .header-content {
+    flex-direction: column;
+    gap: var(--space-4);
+    text-align: center;
+    height: auto;
+    padding: var(--space-4);
+  }
+
+  .header-wrapper .logo-section {
+    justify-content: center;
+  }
+
+  .header-wrapper .nav-links {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-3);
+  }
+
+  .header-wrapper .company-info h1 {
+    font-size: var(--text-xl);
+  }
+
+  .header-wrapper .header-buttons {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .header-wrapper .user-section {
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+}
+
+@media (max-width: 480px) {
+  .header-wrapper .nav-links {
+    gap: var(--space-2);
+  }
+
+  .header-wrapper .nav-links a {
+    font-size: var(--text-xs);
+    padding: var(--space-1) var(--space-2);
+  }
+
+  .header-wrapper .btn-header {
+    font-size: var(--text-xs);
+    padding: var(--space-1) var(--space-3);
+  }
+  
+  .header-wrapper .company-names {
+    font-size: var(--text-base);
+  }
+}

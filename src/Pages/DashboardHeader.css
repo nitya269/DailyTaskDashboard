@@ -1,0 +1,163 @@
+/* DashboardHeader Component - Modern Design */
+@import '../styles/design-tokens.css';
+
+.dashboard-header-wrapper {
+  font-family: var(--font-family-primary);
+}
+
+.dashboard-header-wrapper * {
+  box-sizing: border-box;
+}
+
+/* Header Container - Professional */
+.dashboard-header-wrapper .header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--border-dark);
+  padding: var(--space-4) var(--space-6);
+  box-shadow: var(--card-shadow);
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  height: var(--header-height);
+}
+
+/* Left Section */
+.dashboard-header-wrapper .header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.dashboard-header-wrapper .logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.dashboard-header-wrapper .company-logo {
+  height: 2.5rem;
+  width: auto;
+  border-radius: var(--radius-sm);
+}
+
+.dashboard-header-wrapper .company-title {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.dashboard-header-wrapper .company-name {
+  font-size: var(--text-xl);
+  font-weight: var(--font-bold);
+  color: var(--text-light);
+  line-height: 1.2;
+  margin: 0;
+}
+
+.dashboard-header-wrapper .employee-info {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: var(--space-1);
+  background: var(--primary-50);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-button);
+  border: 1px solid var(--primary-200);
+}
+
+/* Right Section */
+.dashboard-header-wrapper .header-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.dashboard-header-wrapper .user-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-light);
+  background: rgba(255, 255, 255, 0.1);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-button);
+  border: 1px solid var(--border-dark);
+}
+
+/* Logout Button */
+.dashboard-header-wrapper .logout-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background: var(--danger);
+  color: white;
+  border: none;
+  border-radius: var(--radius-button);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  box-shadow: var(--card-shadow);
+}
+
+.dashboard-header-wrapper .logout-btn:hover {
+  background: var(--danger-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+}
+
+.dashboard-header-wrapper .logout-btn:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .dashboard-header-wrapper .header-container {
+    padding: var(--space-3) var(--space-4);
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    height: auto;
+  }
+  
+  .dashboard-header-wrapper .company-name {
+    font-size: var(--text-lg);
+  }
+  
+  .dashboard-header-wrapper .employee-info {
+    font-size: 0.625rem;
+  }
+  
+  .dashboard-header-wrapper .header-right {
+    gap: var(--space-2);
+  }
+  
+  .dashboard-header-wrapper .user-name {
+    font-size: var(--text-xs);
+    padding: var(--space-1) var(--space-2);
+  }
+  
+  .dashboard-header-wrapper .logout-btn {
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--text-xs);
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-header-wrapper .header-container {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .dashboard-header-wrapper .header-left {
+    justify-content: center;
+  }
+  
+  .dashboard-header-wrapper .company-title {
+    align-items: center;
+  }
+}
