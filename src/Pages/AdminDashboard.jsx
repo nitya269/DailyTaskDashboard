@@ -1,15 +1,15 @@
 import "./AdminDashboard.css";
 import * as XLSX from "xlsx";
+import Active from "./Active";
 import DashboardHeader from "./DashboardHeader";
 import Footer from "./Footer";
 import Header from "./Header";
 import React, { useEffect, useState } from "react";
+import Task from "./Task";
 import TaskAssignForm from "./TaskAssignForm";
 import axios from "axios";
 import { saveAs } from "file-saver";
 import { useNavigate } from "react-router-dom";
-import Task from "./Task";
-import Active from "./Active";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -249,14 +249,37 @@ export default function AdminDashboard() {
       <DashboardHeader currentUser={null} />
       <div className="container">
         {/* Nav bar - FIXED: Added the button here */}
-        <div className="nav-bars">
-          <div>
-            <button onClick={showEmployees}>Manage Employees</button>
-            <button onClick={showTasks}>Assign Tasks</button>
-            <button onClick={() => navigate('/employee-dashboard/admin')}>View Employee Dashboard</button>
-            <button onClick={() => navigate('/report')}>Report</button>
-          </div>
-        </div>
+      <div className="nav-bars">
+  <button
+    onClick={() => { showEmployees(); setActivePage("employees"); }}
+    className={`nav-btn ${activePage === "employees" ? "active" : ""}`}
+  >
+    Manage Employees
+  </button>
+
+  <button
+    onClick={() => { showTasks(); setActivePage("tasks"); }}
+    className={`nav-btn ${activePage === "tasks" ? "active" : ""}`}
+  >
+    Assign Tasks
+  </button>
+
+  <button
+    onClick={() => { navigate('/employee-dashboard/admin'); setActivePage("viewDashboard"); }}
+    className={`nav-btn ${activePage === "viewDashboard" ? "active" : ""}`}
+  >
+    View Employee Dashboard
+  </button>
+
+  <button
+    onClick={() => { navigate('/report'); setActivePage("report"); }}
+    className={`nav-btn ${activePage === "report" ? "active" : ""}`}
+  >
+    Report
+  </button>
+</div>
+
+
   
         {/* Dashboard */}
         {activePage === "dashboard" && (

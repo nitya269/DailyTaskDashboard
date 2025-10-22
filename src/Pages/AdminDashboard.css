@@ -129,6 +129,63 @@
   box-shadow: var(--card-shadow);
 }
 
+/* Active tab highlighting */
+.admin-dashboard-wrapper .nav-bars .nav-btn.active,
+.admin-dashboard-wrapper .nav-bars button.active {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.18), 0 2px 6px rgba(0,0,0,0.08);
+  border-width: 2px;
+  outline: none;
+}
+
+/* Make active tab more contrasting depending on its color scheme */
+.admin-dashboard-wrapper .nav-bars button.active:nth-child(1) {
+  background: linear-gradient(135deg, var(--primary-hover) 0%, var(--primary-dark) 100%);
+  border-color: rgba(21,101,192,0.95);
+  color: #fff;
+}
+.admin-dashboard-wrapper .nav-bars button.active:nth-child(2) {
+  background: linear-gradient(135deg, var(--success-hover) 0%, var(--success-700) 100%);
+  border-color: rgba(16,185,129,0.95);
+  color: #fff;
+}
+.admin-dashboard-wrapper .nav-bars button.active:nth-child(3) {
+  background: linear-gradient(135deg, var(--purple-hover) 0%, var(--purple-700) 100%);
+  border-color: rgba(132,79,193,0.95);
+  color: #fff;
+}
+.admin-dashboard-wrapper .nav-bars button.active:nth-child(4) {
+  background: linear-gradient(135deg, var(--warning-hover) 0%, var(--warning-600) 100%);
+  border-color: rgba(245,158,11,0.95);
+  color: var(--text-dark);
+}
+
+/* Visible focus ring for keyboard users */
+.admin-dashboard-wrapper .nav-bars button:focus {
+  box-shadow: 0 0 0 4px rgba(25, 118, 210, 0.12), 0 6px 18px rgba(0,0,0,0.08);
+  outline: none;
+}
+
+/* Persistent bottom indicator for active tab */
+.admin-dashboard-wrapper .nav-bars .nav-btn.active::after,
+.admin-dashboard-wrapper .nav-bars button.active::after {
+  content: '';
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 6px;
+  height: 4px;
+  border-radius: 4px;
+  background: rgba(255,255,255,0.18);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12) inset;
+}
+
+/* Ensure active styles win over nth-child defaults */
+.admin-dashboard-wrapper .nav-bars .nav-btn.active,
+.admin-dashboard-wrapper .nav-bars button.active {
+  z-index: 2; /* stay above siblings */
+}
+
 /* Dashboard Section */
 .admin-dashboard-wrapper .dashboard-section {
   text-align: center;

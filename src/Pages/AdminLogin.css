@@ -323,3 +323,20 @@
     font-size: var(--text-xs);
   }
 }
+.nav-bars .nav-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  background-color: #f3f4f6;
+  color: #374151;
+  font-weight: 600;
+  margin-right: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.nav-bars .nav-btn.active {
+  background: #3b82f6; /* primary blue */
+  color: white;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
