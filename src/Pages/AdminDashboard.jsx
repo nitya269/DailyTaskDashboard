@@ -30,10 +30,13 @@ export default function AdminDashboard() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [form, setForm] = useState({
+    emp_code: "",
     name: "",
     email: "",
     department: "",
     position: "",
+    mobile: "",
+    date_of_joining: "",
   });
 
   const fetchEmployees = async () => {
@@ -141,12 +144,13 @@ export default function AdminDashboard() {
     try {
       const res = await axios.post("http://localhost:5000/api/emp_details", form);
       const newEmp = {
-        emp_code: res.data.emp_code ?? res.data.id ?? crypto.randomUUID(),
+        emp_code:res.data.emp_code ?? "",
         name: res.data.name ?? "",
         email: res.data.email ?? "",
         department: res.data.department ?? "",
         position: res.data.position ?? "",
-        id: res.data.id ?? res.data.emp_code ?? crypto.randomUUID(),
+        mobile:res.data.mobile ?? "",
+        date_of_joining:res.data.date_of_joining ?? "",
       };
       setEmployees(prev => [...prev, newEmp]);
       setForm({ name: "", email: "", department: "", position: "" });
@@ -395,6 +399,10 @@ export default function AdminDashboard() {
               <div className="form-grid">
                 <div className="form-row">
                   <div className="form-field">
+                    <labe>Employee Code</labe>
+                    <input type="text" name="emp_code" placeholder="Enter employee code" value={form.emp_code} onChange={handleChange} required disabled={isSubmitting} />
+                  </div>
+                  <div className="form-field">
                     <label>Employee Name</label>
                     <input type="text" name="name" placeholder="Enter employee name" value={form.name} onChange={handleChange} required disabled={isSubmitting} />
                   </div>
@@ -417,6 +425,14 @@ export default function AdminDashboard() {
                     <label>Position</label>
                     <input type="text" name="position" placeholder="Enter position" value={form.position} onChange={handleChange} required disabled={isSubmitting} />
                   </div>
+                  <label>Mobile</label>
+                  <input type="text" name="mobile" placeholder="Enter mobile number" value={form.mobile} onChange={handleChange} required disabled={isSubmitting} />
+                </div>
+                <div className="form-row">
+                  <div className="form-field">
+                    <label>Date of Joining</label>
+                    <input type="date" name="date_of_joining" placeholder="Enter date of joining" value={form.date_of_joining} onChange={handleChange} required disabled={isSubmitting} />
+                  </div>
                 </div>
               </div>
               <div className="form-submit">
@@ -435,12 +451,15 @@ export default function AdminDashboard() {
               <table className="employee-table">
                 <thead>
                   <tr>
-                    <th>ID</th>
+                    <th>Employee Code</th>
                     <th>Name</th>
                     <th>Email</th>
                     <th>Department</th>
                     <th>Position</th>
+                    <th>Mobile</th>
+                    <th>Date of Joining</th>
                     <th>Actions</th>
+                    <th></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -451,6 +470,8 @@ export default function AdminDashboard() {
                       <td>{emp.email}</td>
                       <td>{emp.department}</td>
                       <td>{emp.position}</td>
+                      <td>{emp.mobile}</td>
+                      <td>{emp.date_of_joining}</td>  
                       <td>
                         <button onClick={() => deleteEmployee(emp.id)}>Delete</button>
                       </td>
