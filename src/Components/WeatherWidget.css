@@ -1,6 +1,6 @@
 /* Base styles */
 .weather-widget {
-  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  background: transparent; /* Remove gradient background to show video clearly */
   color: white;
   border-radius: 12px;
   padding: 1rem;
@@ -18,60 +18,37 @@
   flex-direction: column;
 }
 
-/* Weather effect overlays */
-.weather-effect {
+/* Weather Background Video */
+.weather-background-video {
   position: absolute;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  pointer-events: none;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  opacity: 0.7; /* Increased opacity for better video visibility */
+  transition: opacity 0.5s ease;
+}
+
+/* Video overlay to ensure text readability */
+.weather-widget::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.2); /* Lighter overlay for better video visibility */
   z-index: 1;
-  opacity: 0.5;
+  pointer-events: none;
 }
 
-/* Rain effect */
-.rain .weather-effect.rain {
-  background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 0 L52 20 M50 20 L52 40 M50 40 L52 60 M50 60 L52 80' stroke='%23ffffff' stroke-width='1' fill='none'/%3E%3C/svg%3E") repeat;
-  animation: rain 0.5s linear infinite;
-  opacity: 0.4;
-}
+/* Old weather effects removed - now using video backgrounds */
 
-@keyframes rain {
-  from { background-position: 0 0; }
-  to { background-position: 10% 100%; }
-}
-
-/* Snow effect */
-.snow .weather-effect.snow {
-  background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='10' cy='10' r='1' fill='white'/%3E%3Ccircle cx='30' cy='30' r='0.8' fill='white'/%3E%3Ccircle cx='70' cy='20' r='0.6' fill='white'/%3E%3Ccircle cx='90' cy='40' r='0.7' fill='white'/%3E%3Ccircle cx='20' cy='70' r='0.9' fill='white'/%3E%3C/svg%3E") repeat;
-  animation: snow 10s linear infinite;
-}
-
-@keyframes snow {
-  from { background-position: 0 -100px; }
-  to { background-position: 0 100%; }
-}
-
-/* Thunder effect */
-.thunder .weather-effect.thunder {
-  animation: thunder 8s infinite;
-  background: rgba(255, 255, 255, 0.1);
-}
-
-@keyframes thunder {
-  0% { opacity: 0; }
-  1% { opacity: 0.4; }
-  2% { opacity: 0; }
-  8% { opacity: 0; }
-  9% { opacity: 0.6; }
-  10% { opacity: 0; }
-  100% { opacity: 0; }
-}
-
-.weather-widget > *:not(.weather-effect) {
+.weather-widget > *:not(.weather-background-video) {
   position: relative;
-  z-index: 2;
+  z-index: 3;
 }
 
 /* Compact single row layout */
@@ -144,6 +121,7 @@
   text-align: center;
   line-height: 1.3;
   padding: 0.2rem 0.3rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8); /* Enhanced text shadow for readability */
 }
 
 .current-day {
@@ -162,6 +140,7 @@
   white-space: nowrap;
   text-align: center;
   padding: 0.2rem 0.3rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8); /* Enhanced text shadow for readability */
 }
 
 .weather-icon-container {
@@ -713,12 +692,23 @@
     break-inside: avoid;
   }
   
-  .weather-effect {
+  .weather-background-video {
     display: none;
   }
   
   .forecast-days {
     display: grid !important;
     grid-template-columns: repeat(7, 1fr) !important;
+  }
+}
+
+/* Video background responsive adjustments */
+@media (max-width: 768px) {
+  .weather-background-video {
+    opacity: 0.6; /* Better visibility on mobile */
+  }
+  
+  .weather-widget::before {
+    background: rgba(0, 0, 0, 0.3); /* Lighter overlay on mobile */
   }
 }

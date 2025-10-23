@@ -165,13 +165,22 @@ const WeatherWidget = () => {
     return '🌤️';
   };
 
-  const getWeatherEffect = (code) => {
-    if (code >= 51 && code <= 67) return 'rain';
-    if (code >= 71 && code <= 77) return 'snow';
-    if (code >= 80 && code <= 82) return 'rain';
-    if (code >= 85 && code <= 86) return 'snow';
-    if (code >= 95 && code <= 99) return 'thunder';
-    return '';
+  // Old weather effects function removed - now using video backgrounds
+
+  const getWeatherVideo = (code) => {
+    // Clear sky and sunny conditions
+    if (code === 0 || code === 1) return 'Sunny.mp4';
+    
+    // Cloudy conditions
+    if (code >= 2 && code <= 3) return 'cloudy.mp4';
+    
+    // Rainy conditions
+    if (code >= 51 && code <= 67) return 'rainy.mp4';
+    if (code >= 80 && code <= 82) return 'rainy.mp4';
+    if (code >= 95 && code <= 99) return 'rainy.mp4'; // Thunderstorms
+    
+    // Default to cloudy for other conditions
+    return 'cloudy.mp4';
   };
 
   const getWeatherDescription = (code) => {
@@ -181,13 +190,24 @@ const WeatherWidget = () => {
   if (loading) return <div className="weather-widget loading">Loading weather...</div>;
   if (error) return <div className="weather-widget error">{error}</div>;
 
-  const currentEffect = weather ? getWeatherEffect(weather.weatherCode) : '';
+  const currentVideo = weather ? getWeatherVideo(weather.weatherCode) : 'cloudy.mp4';
 
   return (
-    <div className={`weather-widget ${currentEffect}`}>
-      {currentEffect === 'rain' && <div className="weather-effect rain"></div>}
-      {currentEffect === 'snow' && <div className="weather-effect snow"></div>}
-      {currentEffect === 'thunder' && <div className="weather-effect thunder"></div>}
+    <div className="weather-widget">
+      {/* Weather Background Video */}
+      <video 
+        className="weather-background-video" 
+        autoPlay 
+        loop 
+        muted 
+        playsInline
+        key={currentVideo} // Force re-render when video changes
+      >
+        <source src={`/${currentVideo}`} type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+      
+      {/* Old weather effects removed - now using video backgrounds */}
 
       {weather && (
         <>
