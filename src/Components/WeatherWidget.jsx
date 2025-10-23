@@ -49,6 +49,11 @@ const WeatherWidget = () => {
     }))
   );
   const [showHourly, setShowHourly] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const toggleForecast = () => {
+    setIsExpanded(!isExpanded);
+  };
 
   const latitude = 16.5062; // Vijayawada
   const longitude = 80.6480;
@@ -72,14 +77,22 @@ const WeatherWidget = () => {
         const current = currentResponse.data.current_weather;
         const daily = forecastResponse.data.daily;
 
+        // Get forecast for next 7 days (excluding today)
         const forecastData = daily.time.map((date, index) => ({
-          date: new Date(date).toLocaleDateString('en-IN', { weekday: 'short' }),
+          date: new Date(date).toLocaleDateString('en-IN', { 
+            weekday: 'short',
+            day: 'numeric',
+            month: 'short' 
+          }),
           maxTemp: Math.round(daily.temperature_2m_max[index]),
           minTemp: Math.round(daily.temperature_2m_min[index]),
           weatherCode: daily.weathercode[index],
           precipitation: daily.precipitation_sum[index],
           windSpeed: daily.windspeed_10m_max[index],
         }));
+        
+        // Remove today's forecast and get next 7 days
+        const nextSevenDays = forecastData.slice(1, 8); // This should give us 7 days (indices 1 through 7)
 
         const weatherData = {
           temperature: current.temperature,
@@ -96,24 +109,33 @@ const WeatherWidget = () => {
         const now = new Date();
         const currentHour = now.getHours();
         const hourlyData = [];
-        for (let i = 0; i < 6; i++) {
+        
+        const hoursToShow = 24;
+        for (let i = 0; i < hoursToShow; i++) {
+          const hourIndex = currentHour + i;
           const hourTime = new Date();
-          hourTime.setHours(currentHour + i, 0, 0, 0);
+          hourTime.setHours(hourTime.getHours() + i);
+          
           const formattedHour = hourTime.toLocaleTimeString('en-IN', {
-            hour: '2-digit',
+            hour: 'numeric',
             hour12: true,
-          });
+          }).replace(' ', '');
+          
+          const dayIndex = Math.floor(hourIndex / 24);
+          const hourInDay = hourIndex % 24;
+          
           hourlyData.push({
             time: formattedHour,
-            temp: Math.round(hourlyResponse.data.hourly.temperature_2m[currentHour + i]),
-            code: hourlyResponse.data.hourly.weathercode[currentHour + i],
-            precipitation: hourlyResponse.data.hourly.precipitation_probability[currentHour + i],
+            temp: Math.round(hourlyResponse.data.hourly.temperature_2m[hourIndex]),
+            code: hourlyResponse.data.hourly.weathercode[hourIndex],
+            precipitation: hourlyResponse.data.hourly.precipitation_probability[hourIndex],
+            isDay: hourInDay >= 6 && hourInDay < 18, 
           });
         }
 
         setWeather(weatherData);
-        setForecast(forecastData.slice(0, 7));
-        setHourlyForecast(hourlyData.slice(0, 6));
+        setForecast(nextSevenDays);
+        setHourlyForecast(hourlyData);
         setLastUpdated(
           new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
         );
@@ -152,6 +174,10 @@ const WeatherWidget = () => {
     return '';
   };
 
+  const getWeatherDescription = (code) => {
+    return weatherCodes[code] || 'Unknown';
+  };
+
   if (loading) return <div className="weather-widget loading">Loading weather...</div>;
   if (error) return <div className="weather-widget error">{error}</div>;
 
@@ -163,76 +189,106 @@ const WeatherWidget = () => {
       {currentEffect === 'snow' && <div className="weather-effect snow"></div>}
       {currentEffect === 'thunder' && <div className="weather-effect thunder"></div>}
 
-      <div className="weather-header">
-        <h3>Vijayawada Weather</h3>
-        <span className="last-updated">Updated: {lastUpdated}</span>
-      </div>
-
       {weather && (
         <>
           <div className="current-weather">
-            <div className="weather-main">
-              <div className="temperature-section">
+            <div className="weather-single-row">
+              <div className="weather-item">
+                <span className="location">
+                  {new Date().toLocaleDateString('en-IN', { weekday: 'long' })} Vijayawada
+                </span>
+              </div>
+              <div className="weather-item">
                 <span className="temperature">{Math.round(weather.temperature)}°C</span>
-                <span className="wind">| Wind: {weather.windSpeed} km/h</span>
               </div>
-              <div className="weather-description">{weather.weatherDescription}</div>
-              <div className="weather-icon">
-                {getWeatherIcon(weather.weatherCode, weather.isDay)}
+              <div className="weather-item">
+                <div className="weather-icon">
+                  {getWeatherIcon(weather.weatherCode, weather.isDay)}
+                  <div className="weather-description">
+                    {getWeatherDescription(weather.weatherCode)}
+                  </div>
+                </div>
               </div>
+              <div className="weather-item">
+                <span className="wind">Wind: {weather.windSpeed} km/h</span>
+              </div>
+              <div className="weather-item">
+                <span className="last-updated">Updated: {lastUpdated}</span>
+              </div>
+            </div>
+            <div className="expand-button-container">
+              <button 
+                className="expand-button" 
+                onClick={toggleForecast}
+                aria-label={isExpanded ? 'Collapse forecast' : 'View forecast'}
+              >
+                {isExpanded ? '▲' : '▼'} View Forecast
+              </button>
             </div>
           </div>
 
-          <div className="forecast-tabs">
-            <button
-              className={`forecast-tab ${!showHourly ? 'active' : ''}`}
-              onClick={() => setShowHourly(false)}
-            >
-              7-Day Forecast
-            </button>
-            <button
-              className={`forecast-tab ${showHourly ? 'active' : ''}`}
-              onClick={() => setShowHourly(true)}
-            >
-              Hourly
-            </button>
-          </div>
+          {isExpanded && (
+            <div className="forecast-container">
+              <div className="forecast-tabs">
+                <button
+                  className={`forecast-tab ${!showHourly ? 'active' : ''}`}
+                  onClick={() => setShowHourly(false)}
+                >
+                  7-Day Forecast
+                </button>
+                <button
+                  className={`forecast-tab ${showHourly ? 'active' : ''}`}
+                  onClick={() => setShowHourly(true)}
+                >
+                  Hourly
+                </button>
+              </div>
 
           {!showHourly ? (
             <div className="forecast-days">
-              {forecast.map((day, index) => (
-                <div key={index} className="forecast-day">
-                  <div className="day">{day.date}</div>
-                  <div className="forecast-icon">{getWeatherIcon(day.weatherCode, true)}</div>
-                  <div className="forecast-temp">
-                    <span className="max-temp">{day.maxTemp}°</span>
-                    <span className="min-temp">{day.minTemp}°</span>
+              {forecast.length > 0 ? (
+                forecast.slice(0, 7).map((day, index) => (
+                  <div key={index} className="forecast-day">
+                    <div className="day">{day.date}</div>
+                    <div className="forecast-icon">{getWeatherIcon(day.weatherCode, true)}</div>
+                    <div className="forecast-temp">
+                      <span className="max-temp">{day.maxTemp}°</span>
+                      <span className="min-temp">{day.minTemp}°</span>
+                    </div>
+                    {day.precipitation > 0 && (
+                      <div className="precipitation">💧 {day.precipitation}mm</div>
+                    )}
                   </div>
-                  {day.precipitation > 0 && (
-                    <div className="precipitation">💧 {day.precipitation}mm</div>
-                  )}
-                </div>
-              ))}
+                ))
+              ) : (
+                <div className="no-forecast">Loading forecast data...</div>
+              )}
             </div>
           ) : (
             <div className="hourly-forecast">
-              {hourlyForecast.map((hour, index) => {
-                const currentHour = new Date().getHours();
-                const isDay = currentHour + index >= 6 && currentHour + index < 20;
-                return (
-                  <div key={index} className="hourly-item">
-                    <div className="hourly-time">{index === 0 ? 'Now' : hour.time}</div>
-                    <div className="hourly-weather">
-                      <div className="hourly-icon">{getWeatherIcon(hour.code, isDay)}</div>
-                      <div className="hourly-temp">{Math.round(hour.temp)}°</div>
-                      <div className="hourly-condition">{weatherCodes[hour.code]}</div>
+              {hourlyForecast.length > 0 ? (
+                hourlyForecast.map((hour, index) => {
+                  const currentHour = new Date().getHours();
+                  const isDay = currentHour + index >= 6 && currentHour + index < 20;
+                  return (
+                    <div key={index} className="hourly-item">
+                      <div className="hourly-time">{index === 0 ? 'Now' : hour.time}</div>
+                      <div className="hourly-weather">
+                        <div className="hourly-icon">{getWeatherIcon(hour.code, isDay)}</div>
+                        <div className="hourly-temp">{Math.round(hour.temp)}°</div>
+                        <div className="hourly-condition">{weatherCodes[hour.code]}</div>
+                      </div>
+                      {hour.precipitation > 0 && (
+                        <div className="hourly-precipitation">💧 {hour.precipitation}%</div>
+                      )}
                     </div>
-                    {hour.precipitation > 0 && (
-                      <div className="hourly-precipitation">💧 {hour.precipitation}%</div>
-                    )}
-                  </div>
-                );
-              })}
+                  );
+                })
+              ) : (
+                <div className="no-hourly">Loading hourly forecast...</div>
+              )}
+            </div>
+          )}
             </div>
           )}
         </>
