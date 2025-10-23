@@ -26,8 +26,12 @@
 
 /* Back Button - Enhanced with Background Color */
 .employee-dashboard-wrapper .back-btn {
-  display: inline-flex;
+  
+  justify-content: flex-start;
+  display: flex;
+  justify-content: flex-start; /* Moves content to the left */
   align-items: center;
+  padding: 1rem;
   gap: var(--space-2);
   padding: var(--space-3) var(--space-5);
   background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);

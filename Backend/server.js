@@ -48,7 +48,7 @@ app.post("/api/login", async (req, res) => {
 
     // 1️⃣ Check if user exists in admin table
     const adminResult = await pool.query(
-      "SELECT id, username, password, role, created_at FROM admin WHERE username = $1",
+      "SELECT username, password, role, created_at FROM admin WHERE username = $1",
       [trimmedUsername]
     );
 
@@ -67,7 +67,7 @@ app.post("/api/login", async (req, res) => {
     );
 
       userData = {
-        id: adminUser.id,
+        id: null,
         emp_code: adminUser.username,
         username: adminUser.username,
         role: adminUser.role,
@@ -80,7 +80,7 @@ app.post("/api/login", async (req, res) => {
     } else {
       // Check employee table
       const empResult = await pool.query(
-        "SELECT emp_code, name, department,position, password FROM emp_details WHERE emp_code = $1",
+        "SELECT id, emp_code, name, department,position, password FROM emp_details WHERE emp_code = $1",
         [username]
       );
 
@@ -95,7 +95,7 @@ app.post("/api/login", async (req, res) => {
 
       role = "employee";
       userData = {
-        id: null, // employee table may not have id
+        id: empUser.id, // employee table may not have id
         emp_code: empUser.emp_code,
         username: empUser.emp_code,
         role: role,
@@ -136,8 +136,8 @@ app.post("/api/emp_details", async (req, res) => {
     const emp_code = await generateEmpCode();
 
     const result = await pool.query(
-      `INSERT INTO emp_details (emp_code, name, email, department, position) 
-       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+      `INSERT INTO emp_details (id, emp_code, name, email, department, position,mobile,date_of_joining) 
+       VALUES ($1, $2, $3, $4, $5, $6,$7,$8) RETURNING *`,
       [emp_code, name, email, department, position]
     );
 

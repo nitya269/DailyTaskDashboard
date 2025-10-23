@@ -31,6 +31,7 @@ export default function AdminDashboard() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [form, setForm] = useState({
+    id: "",
     emp_code: "",
     name: "",
     email: "",
@@ -46,6 +47,7 @@ export default function AdminDashboard() {
       const normalized = res.data.map(emp => {
         const uniqueId = emp.id ?? emp.emp_code ?? crypto.randomUUID();
         return {
+          id: uniqueId,
           emp_code: emp.emp_code ?? uniqueId,
           name: emp.name ?? "",
           email: emp.email ?? "",
@@ -53,7 +55,7 @@ export default function AdminDashboard() {
           position: emp.position ?? "",
           mobile: emp.mobile ?? "",
           date_of_joining: emp.date_of_joining ?? "",
-          id: uniqueId,
+          
         };
       });
       setEmployees(normalized);

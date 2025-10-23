@@ -202,79 +202,72 @@
 .hourly-precipitation {
   font-size: 0.7rem;
   background: rgba(0, 120, 255, 0.2);
-  padding: 0.1rem 0.3rem;
+  padding: 0.2rem 0.4rem;
   border-radius: 4px;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.2rem;
-  margin-top: 0.2rem;
+  margin-top: 0.3rem;
+  width: auto;
+  min-width: 50%;
 }
 
 .weather-detail .hourly-temp {
   font-weight: 600;
   font-size: 1rem;
-  min-width: 30px;
   text-align: center;
+  margin: 0.2rem 0;
 }
 
 .hourly-item {
-  display: flex;
-  align-items: center;
   background: rgba(255, 255, 255, 0.1);
-  border-radius: 6px;
-  padding: 0.6rem 0.8rem;
+  border-radius: 8px;
+  padding: 0.8rem 0.5rem;
+  text-align: center;
   transition: all 0.2s ease;
-  gap: 1rem;
-  position: relative;
-  min-height: 60px;
-}
-
-.hourly-item:not(:last-child)::after {
-  content: '';
-  position: absolute;
-  bottom: -3px;
-  left: 1rem;
-  right: 1rem;
-  height: 1px;
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.hourly-time {
+  min-width: 60px;
+  flex: 0 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-width: 80px;
+  justify-content: space-between;
+  box-sizing: border-box;
+  height: 100px;
+}
+
+.hourly-time {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 0.3rem;
+  font-weight: 500;
+  white-space: nowrap;
 }
 
 .hourly-weather {
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.hourly-description {
-  font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.9);
-  flex-grow: 1;
-  line-height: 1.4;
-  padding-left: 0.5rem;
-  border-left: 1px solid rgba(255, 255, 255, 0.1);
-  margin-left: 0.5rem;
-}
-
-.hourly-scroll {
-  display: flex;
   flex-direction: column;
-  overflow-y: auto;
-  padding: 0.3rem 0.5rem;
-  gap: 0.6rem;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
-  height: 100%;
-  flex-grow: 1;
+  align-items: center;
+  gap: 0.3rem;
 }
 
-/* Forecast Styles */
+.hourly-icon {
+  font-size: 1.2rem;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0.1rem 0;
+}
+
+.hourly-temp {
+  font-weight: 600;
+  font-size: 1rem;
+  text-align: center;
+  margin: 0.2rem 0;
+}
+
 .forecast {
   margin-top: 1.5rem;
 }
@@ -301,6 +294,12 @@
 .forecast-tab:hover {
   background: rgba(255, 255, 255, 0.1);
   color: #fff;
+}
+
+.forecast-tab.active {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-weight: 600;
 }
 
 .forecast-days {
@@ -333,12 +332,8 @@
 }
 
 .forecast-day .forecast-icon {
-  font-size: 1.2rem;
-  margin: 0.2rem 0;
-  height: 1.2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  font-size: 1.5rem;
+  margin: 0.5rem 0;
 }
 
 .forecast-day .forecast-temp {
@@ -358,9 +353,9 @@
 }
 
 .forecast-day .precipitation {
-  font-size: 0.65rem;
+  font-size: 0.7rem;
   opacity: 0.9;
-  margin-top: 0.1rem;
+  margin-top: 0.3rem;
   color: #a8d8ff;
   display: flex;
   align-items: center;
@@ -369,28 +364,28 @@
 }
 
 .hourly-forecast {
-  margin-top: 0.3rem;
-  overflow: hidden;
-  height: 200px;
-  flex-grow: 1;
+  margin-top: 0.5rem;
   display: flex;
-  flex-direction: column;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
-  padding: 0.5rem;
-}
-
-.hourly-forecast .forecast-days {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 0.4rem;
-  margin-top: 0.3rem;
-  overflow-y: auto;
-  max-height: 150px;
-  padding: 0.3rem 0.2rem 0.5rem;
-  flex-grow: 1;
+  overflow-x: auto;
+  gap: 0.5rem;
+  padding: 0.5rem 0.5rem 1rem;
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+  width: 100%;
+  -webkit-overflow-scrolling: touch;
+}
+
+.hourly-forecast::-webkit-scrollbar {
+  height: 4px;
+}
+
+.hourly-forecast::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.hourly-forecast::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
 }
 
 /* Responsive Adjustments */
