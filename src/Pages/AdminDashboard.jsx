@@ -1,3 +1,4 @@
+
 import "./AdminDashboard.css";
 import * as XLSX from "xlsx";
 import Active from "./Active";
@@ -9,6 +10,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { saveAs } from "file-saver";
 import { useNavigate } from "react-router-dom";
+import WeatherWidget from "../Components/WeatherWidget";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -253,6 +255,8 @@ export default function AdminDashboard() {
     <div className="admin-dashboard-wrapper">
       <DashboardHeader currentUser={null} />
       <div className="container">
+        {/* Weather Widget */}
+        <WeatherWidget />
 
         {/* Nav bar */}
         <div className="nav-bars">
