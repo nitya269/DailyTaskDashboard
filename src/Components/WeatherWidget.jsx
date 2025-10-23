@@ -194,9 +194,14 @@ const WeatherWidget = () => {
           <div className="current-weather">
             <div className="weather-single-row">
               <div className="weather-item">
-                <span className="location">
-                  {new Date().toLocaleDateString('en-IN', { weekday: 'long' })} Vijayawada
-                </span>
+                <div className="location-container">
+                  <span className="current-day">
+                    {new Date().toLocaleDateString('en-IN', { weekday: 'long' })}
+                  </span>
+                  <span className="location">
+                    Vijayawada
+                  </span>
+                </div>
               </div>
               <div className="weather-item">
                 <span className="temperature">{Math.round(weather.temperature)}°C</span>
