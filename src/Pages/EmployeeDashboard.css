@@ -26,10 +26,10 @@
 
 /* Back Button - Enhanced with Background Color */
 .employee-dashboard-wrapper .back-btn {
+
   
-  justify-content: flex-start;
-  display: flex;
-  justify-content: flex-start; /* Moves content to the left */
+   /* Moves content to the left */
+  margin-left:-99px;
   align-items: center;
   padding: 1rem;
   gap: var(--space-2);
