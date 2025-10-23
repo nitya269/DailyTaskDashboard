@@ -3,10 +3,9 @@ import * as XLSX from "xlsx";
 import Active from "./Active";
 import DashboardHeader from "./DashboardHeader";
 import Footer from "./Footer";
-import Header from "./Header";
-import React, { useEffect, useState } from "react";
 import Task from "./Task";
 import TaskAssignForm from "./TaskAssignForm";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { saveAs } from "file-saver";
 import { useNavigate } from "react-router-dom";
@@ -50,6 +49,8 @@ export default function AdminDashboard() {
           email: emp.email ?? "",
           department: emp.department ?? "",
           position: emp.position ?? "",
+          mobile: emp.mobile ?? "",
+          date_of_joining: emp.date_of_joining ?? "",
           id: uniqueId,
         };
       });
@@ -75,11 +76,11 @@ export default function AdminDashboard() {
         axios.get("http://localhost:5000/api/emp_details"),
         axios.get("http://localhost:5000/api/tasks")
       ]);
-      
+
       const statsData = statsRes.data || {};
       const allEmployees = employeesRes.data || [];
       const allTasks = tasksRes.data || [];
-      
+
       const activeEmployees = allEmployees.filter(emp => {
         const employeeTasks = allTasks.filter(task => task.emp_code === emp.emp_code);
         return employeeTasks.length > 0 && employeeTasks.every(task => task.status === 'Completed');
@@ -144,16 +145,16 @@ export default function AdminDashboard() {
     try {
       const res = await axios.post("http://localhost:5000/api/emp_details", form);
       const newEmp = {
-        emp_code:res.data.emp_code ?? "",
+        emp_code: res.data.emp_code ?? "",
         name: res.data.name ?? "",
         email: res.data.email ?? "",
         department: res.data.department ?? "",
         position: res.data.position ?? "",
-        mobile:res.data.mobile ?? "",
-        date_of_joining:res.data.date_of_joining ?? "",
+        mobile: res.data.mobile ?? "",
+        date_of_joining: res.data.date_of_joining ?? "",
       };
       setEmployees(prev => [...prev, newEmp]);
-      setForm({ name: "", email: "", department: "", position: "" });
+      setForm({ emp_code: "", name: "", email: "", department: "", position: "", mobile: "", date_of_joining: "" });
       setActivePage("employees");
       setSuccessMessage("Employee added successfully!");
       setTimeout(() => setSuccessMessage(""), 3000);
@@ -252,40 +253,39 @@ export default function AdminDashboard() {
     <div className="admin-dashboard-wrapper">
       <DashboardHeader currentUser={null} />
       <div className="container">
-        {/* Nav bar - FIXED: Added the button here */}
-      <div className="nav-bars">
-  <button
-    onClick={() => { showEmployees(); setActivePage("employees"); }}
-    className={`nav-btn ${activePage === "employees" ? "active" : ""}`}
-  >
-    Manage Employees
-  </button>
 
-  <button
-    onClick={() => { showTasks(); setActivePage("tasks"); }}
-    className={`nav-btn ${activePage === "tasks" ? "active" : ""}`}
-  >
-    Assign Tasks
-  </button>
+        {/* Nav bar */}
+        <div className="nav-bars">
+          <button
+            onClick={() => { showEmployees(); setActivePage("employees"); }}
+            className={`nav-btn ${activePage === "employees" ? "active" : ""}`}
+          >
+            Manage Employees
+          </button>
 
-  <button
-    onClick={() => { navigate('/employee-dashboard/admin'); setActivePage("viewDashboard"); }}
-    className={`nav-btn ${activePage === "viewDashboard" ? "active" : ""}`}
-  >
-    View Employee Dashboard
-  </button>
+          <button
+            onClick={() => { showTasks(); setActivePage("tasks"); }}
+            className={`nav-btn ${activePage === "tasks" ? "active" : ""}`}
+          >
+            Assign Tasks
+          </button>
 
-  <button
-    onClick={() => { navigate('/report'); setActivePage("report"); }}
-    className={`nav-btn ${activePage === "report" ? "active" : ""}`}
-  >
-    Report
-  </button>
-</div>
+          <button
+            onClick={() => { navigate('/employee-dashboard/admin'); setActivePage("viewDashboard"); }}
+            className={`nav-btn ${activePage === "viewDashboard" ? "active" : ""}`}
+          >
+            View Employee Dashboard
+          </button>
 
+          <button
+            onClick={() => { navigate('/report'); setActivePage("report"); }}
+            className={`nav-btn ${activePage === "report" ? "active" : ""}`}
+          >
+            Report
+          </button>
+        </div>
 
-  
-        {/* Dashboard */}
+        {/* Dashboard Section */}
         {activePage === "dashboard" && (
           <div className="dashboard-section">
             <h3><b>DASHBOARD</b></h3>
@@ -341,19 +341,7 @@ export default function AdminDashboard() {
                         <td>{emp.name}</td>
                         <td>{emp.position || 'N/A'}</td>
                         <td>
-                          <span style={{
-                            padding: '4px 12px',
-                            borderRadius: '12px',
-                            backgroundColor: '#e3f2fd',
-                            color: '#1976d2',
-                            fontSize: '0.85em',
-                            fontWeight: '500',
-                            display: 'inline-block',
-                            minWidth: '100px',
-                            textAlign: 'center'
-                          }}>
-                            {emp.department || 'N/A'}
-                          </span>
+                          <span className="department-badge">{emp.department || 'N/A'}</span>
                         </td>
                       </tr>
                     ))}
@@ -362,29 +350,10 @@ export default function AdminDashboard() {
               </div>
             )}
 
-            {filterCard === "totalTasks" && (
-              <div className="tasks-wrapper">
-                <Task taskType="totalTasks" tasks={tasks} />
-              </div>
-            )}
-
-            {filterCard === "pendingTasks" && (
-              <div className="tasks-wrapper">
-                <Task taskType="pendingTasks" tasks={tasks} /> 
-              </div>
-            )}
-
-            {filterCard === "completedTasks" && (
-              <div className="tasks-wrapper">
-                <Task taskType="completedTasks" tasks={tasks} />
-              </div>
-            )}
-
-            {filterCard === "activeEmployees" && (
-              <div className="active-employees-wrapper">
-                <Active employees={employees} tasks={tasks} />
-              </div>   
-            )}
+            {filterCard === "totalTasks" && <div className="tasks-wrapper"><Task taskType="totalTasks" tasks={tasks} /></div>}
+            {filterCard === "pendingTasks" && <div className="tasks-wrapper"><Task taskType="pendingTasks" tasks={tasks} /></div>}
+            {filterCard === "completedTasks" && <div className="tasks-wrapper"><Task taskType="completedTasks" tasks={tasks} /></div>}
+            {filterCard === "activeEmployees" && <div className="active-employees-wrapper"><Active employees={employees} tasks={tasks} /></div>}
           </div>
         )}
 
@@ -399,7 +368,7 @@ export default function AdminDashboard() {
               <div className="form-grid">
                 <div className="form-row">
                   <div className="form-field">
-                    <labe>Employee Code</labe>
+                    <label>Employee Code</label>
                     <input type="text" name="emp_code" placeholder="Enter employee code" value={form.emp_code} onChange={handleChange} required disabled={isSubmitting} />
                   </div>
                   <div className="form-field">
@@ -425,13 +394,15 @@ export default function AdminDashboard() {
                     <label>Position</label>
                     <input type="text" name="position" placeholder="Enter position" value={form.position} onChange={handleChange} required disabled={isSubmitting} />
                   </div>
-                  <label>Mobile</label>
-                  <input type="text" name="mobile" placeholder="Enter mobile number" value={form.mobile} onChange={handleChange} required disabled={isSubmitting} />
+                  <div className="form-field">
+                    <label>Mobile</label>
+                    <input type="text" name="mobile" placeholder="Enter mobile number" value={form.mobile} onChange={handleChange} required disabled={isSubmitting} />
+                  </div>
                 </div>
                 <div className="form-row">
                   <div className="form-field">
                     <label>Date of Joining</label>
-                    <input type="date" name="date_of_joining" placeholder="Enter date of joining" value={form.date_of_joining} onChange={handleChange} required disabled={isSubmitting} />
+                    <input type="date" name="date_of_joining" value={form.date_of_joining} onChange={handleChange} required disabled={isSubmitting} />
                   </div>
                 </div>
               </div>
@@ -459,7 +430,6 @@ export default function AdminDashboard() {
                     <th>Mobile</th>
                     <th>Date of Joining</th>
                     <th>Actions</th>
-                    <th></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -473,7 +443,7 @@ export default function AdminDashboard() {
                       <td>{emp.mobile}</td>
                       <td>{emp.date_of_joining}</td>  
                       <td>
-                        <button onClick={() => deleteEmployee(emp.id)}>Delete</button>
+                        <button className="delete-btn" onClick={() => deleteEmployee(emp.id)}>Delete</button>
                       </td>
                     </tr>
                   ))}
