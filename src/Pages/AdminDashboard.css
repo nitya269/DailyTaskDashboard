@@ -1258,6 +1258,7 @@ ed Responsive Design for AdminDashboard */
   }
 }/* Total
  Employees Table - Fixed Alignment */
+/* Task Table - General Styling */
 .admin-dashboard-wrapper .task-list-container .task-table {
   width: 100%;
   border-collapse: collapse;
@@ -1266,6 +1267,10 @@ ed Responsive Design for AdminDashboard */
   border-radius: var(--radius-lg);
   overflow: hidden;
   box-shadow: var(--shadow-sm);
+}
+
+/* Total Employees Table - Fixed Alignment */
+.admin-dashboard-wrapper .total-employees-table .task-table {
   table-layout: fixed; /* Fixed table layout for consistent column widths */
 }
 
@@ -1293,25 +1298,25 @@ ed Responsive Design for AdminDashboard */
   line-height: 1.5;
 }
 
-/* Specific column widths for total employees table */
-.admin-dashboard-wrapper .task-list-container .task-table th:nth-child(1),
-.admin-dashboard-wrapper .task-list-container .task-table td:nth-child(1) {
+/* Specific column widths for total employees table only */
+.admin-dashboard-wrapper .total-employees-table .task-table th:nth-child(1),
+.admin-dashboard-wrapper .total-employees-table .task-table td:nth-child(1) {
   width: 10%;
   text-align: center;
 }
 
-.admin-dashboard-wrapper .task-list-container .task-table th:nth-child(2),
-.admin-dashboard-wrapper .task-list-container .task-table td:nth-child(2) {
+.admin-dashboard-wrapper .total-employees-table .task-table th:nth-child(2),
+.admin-dashboard-wrapper .total-employees-table .task-table td:nth-child(2) {
   width: 30%;
 }
 
-.admin-dashboard-wrapper .task-list-container .task-table th:nth-child(3),
-.admin-dashboard-wrapper .task-list-container .task-table td:nth-child(3) {
+.admin-dashboard-wrapper .total-employees-table .task-table th:nth-child(3),
+.admin-dashboard-wrapper .total-employees-table .task-table td:nth-child(3) {
   width: 25%;
 }
 
-.admin-dashboard-wrapper .task-list-container .task-table th:nth-child(4),
-.admin-dashboard-wrapper .task-list-container .task-table td:nth-child(4) {
+.admin-dashboard-wrapper .total-employees-table .task-table th:nth-child(4),
+.admin-dashboard-wrapper .total-employees-table .task-table td:nth-child(4) {
   width: 35%;
 }
 
@@ -1355,6 +1360,17 @@ ed Responsive Design for AdminDashboard */
   border: 1px solid var(--gray-200);
   margin: var(--space-6) 0;
   overflow-x: auto;
+}
+
+/* Override TaskAssignForm styling when used in AdminDashboard */
+.admin-dashboard-wrapper .task-assign-form-wrapper .task-list-container {
+  background: transparent !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  border: none !important;
+  margin: 0 !important;
+  max-width: none !important;
 }
 
 .admin-dashboard-wrapper .task-list-container h3 {

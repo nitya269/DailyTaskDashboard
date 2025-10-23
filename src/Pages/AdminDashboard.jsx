@@ -29,6 +29,7 @@ export default function AdminDashboard() {
   const [loadingCard, setLoadingCard] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState({});
 
   const [form, setForm] = useState({
     id: "",
@@ -47,7 +48,8 @@ export default function AdminDashboard() {
       const normalized = res.data.map(emp => {
         const uniqueId = emp.id ?? emp.emp_code ?? crypto.randomUUID();
         return {
-          id: uniqueId,
+          id: uniqueId, // Frontend ID for React keys
+          db_id: emp.id, // Database ID for API calls
           emp_code: emp.emp_code ?? uniqueId,
           name: emp.name ?? "",
           email: emp.email ?? "",
@@ -140,14 +142,20 @@ export default function AdminDashboard() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    if (!form.name || !form.email || !form.department || !form.position) {
-      alert("Please fill all fields");
+    if (!form.emp_code || !form.name || !form.email || !form.department || !form.position) {
+      alert("Please fill all required fields");
       setIsSubmitting(false);
       return;
     }
 
     try {
+      console.log("📤 Sending employee data:", form);
+      console.log("📅 Date of joining being sent:", form.date_of_joining);
+      console.log("📱 Mobile number being sent:", form.mobile);
       const res = await axios.post("http://localhost:5000/api/emp_details", form);
+      console.log("📥 Received response:", res.data);
+      console.log("📅 Date of joining in response:", res.data.date_of_joining);
+      console.log("📱 Mobile number in response:", res.data.mobile);
       const newEmp = {
         emp_code: res.data.emp_code ?? "",
         name: res.data.name ?? "",
@@ -164,19 +172,40 @@ export default function AdminDashboard() {
       setTimeout(() => setSuccessMessage(""), 3000);
       fetchStats();
     } catch (err) {
-      console.error("Error adding employee:", err);
+      console.error("❌ Error adding employee:", err);
+      console.error("❌ Error response:", err.response?.data);
+      alert(`Error adding employee: ${err.response?.data?.error || err.message || 'Unknown error'}`);
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const deleteEmployee = async (id) => {
+    console.log("🗑️ Attempting to delete employee with ID:", id);
+    
+    if (!id) {
+      console.error("❌ No ID provided for deletion");
+      alert("Error: No employee ID found for deletion");
+      return;
+    }
+    
+    if (isDeleting[id]) return; // Prevent multiple clicks
+    
+    const confirmDelete = window.confirm("Are you sure you want to delete this employee?");
+    if (!confirmDelete) return;
+    
+    setIsDeleting(prev => ({ ...prev, [id]: true }));
+    
     try {
+      console.log("🗑️ Sending delete request for ID:", id);
       await axios.delete(`http://localhost:5000/api/emp_details/${id}`);
       fetchEmployees();
       fetchStats();
     } catch (err) {
       console.error("Error deleting employee:", err);
+      alert("Error deleting employee. Please try again.");
+    } finally {
+      setIsDeleting(prev => ({ ...prev, [id]: false }));
     }
   };
 
@@ -257,8 +286,8 @@ export default function AdminDashboard() {
     <div className="admin-dashboard-wrapper">
       <DashboardHeader currentUser={null} />
       <div className="container">
-        {/* Weather Widget */}
-        <WeatherWidget />
+        {/* Weather Widget - Only show on dashboard page */}
+        {activePage === "dashboard" && <WeatherWidget />}
 
         {/* Nav bar */}
         <div className="nav-bars">
@@ -329,7 +358,7 @@ export default function AdminDashboard() {
             )}
 
             {filterCard === "totalEmployees" && (
-              <div className="task-list-container">
+              <div className="task-list-container total-employees-table">
                 <h3>All Employees</h3>
                 <table className="task-table">
                   <thead>
@@ -356,9 +385,9 @@ export default function AdminDashboard() {
               </div>
             )}
 
-            {filterCard === "totalTasks" && <div className="tasks-wrapper"><Task taskType="totalTasks" tasks={tasks} /></div>}
-            {filterCard === "pendingTasks" && <div className="tasks-wrapper"><Task taskType="pendingTasks" tasks={tasks} /></div>}
-            {filterCard === "completedTasks" && <div className="tasks-wrapper"><Task taskType="completedTasks" tasks={tasks} /></div>}
+            {filterCard === "totalTasks" && <div className="tasks-wrapper"><Task taskType="totalTasks" tasks={tasks} showFilters={true} /></div>}
+            {filterCard === "pendingTasks" && <div className="tasks-wrapper"><Task taskType="pendingTasks" tasks={tasks} showFilters={true} /></div>}
+            {filterCard === "completedTasks" && <div className="tasks-wrapper"><Task taskType="completedTasks" tasks={tasks} showFilters={true} /></div>}
             {filterCard === "activeEmployees" && <div className="active-employees-wrapper"><Active employees={employees} tasks={tasks} /></div>}
           </div>
         )}
@@ -375,7 +404,7 @@ export default function AdminDashboard() {
                 <div className="form-row">
                   <div className="form-field">
                     <label>Employee Code</label>
-                    <input type="text" name="emp_code" placeholder="Enter employee code" value={form.emp_code} onChange={handleChange} required disabled={isSubmitting} />
+                    <input type="text" name="emp_code" placeholder="Enter employee code (e.g., DS001)" value={form.emp_code} onChange={handleChange} required disabled={isSubmitting} />
                   </div>
                   <div className="form-field">
                     <label>Employee Name</label>
@@ -439,8 +468,8 @@ export default function AdminDashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  {employees.map(emp => (
-                    <tr key={emp.id}>
+                  {employees.map((emp, index) => (
+                    <tr key={emp.id || emp.emp_code || `emp-${index}`}>
                       <td>{emp.emp_code}</td>
                       <td>{emp.name}</td>
                       <td>{emp.email}</td>
@@ -449,7 +478,13 @@ export default function AdminDashboard() {
                       <td>{emp.mobile}</td>
                       <td>{emp.date_of_joining}</td>  
                       <td>
-                        <button className="delete-btn" onClick={() => deleteEmployee(emp.id)}>Delete</button>
+                        <button 
+                          className="delete-btn" 
+                          onClick={() => deleteEmployee(emp.db_id)}
+                          disabled={isDeleting[emp.db_id]}
+                        >
+                          {isDeleting[emp.db_id] ? "Deleting..." : "Delete"}
+                        </button>
                       </td>
                     </tr>
                   ))}

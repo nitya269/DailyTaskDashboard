@@ -132,19 +132,83 @@ async function generateEmpCode() {
 // Add new employee
 app.post("/api/emp_details", async (req, res) => {
   try {
-    const { name, email, department, position } = req.body;
-    const emp_code = await generateEmpCode();
+    console.log("📝 Received employee data:", req.body);
+    console.log("📅 Raw date_of_joining from frontend:", req.body.date_of_joining);
+    const { emp_code, name, email, department, position, mobile, date_of_joining } = req.body;
+    
+    // Validate required fields
+    if (!emp_code || !name || !email || !department || !position) {
+      console.log("❌ Missing required fields:", { emp_code, name, email, department, position });
+      return res.status(400).json({ error: "Missing required fields" });
+    }
 
-    const result = await pool.query(
-      `INSERT INTO emp_details (id, emp_code, name, email, department, position,mobile,date_of_joining) 
-       VALUES ($1, $2, $3, $4, $5, $6,$7,$8) RETURNING *`,
-      [emp_code, name, email, department, position]
-    );
+    // Check if employee code already exists
+    console.log("🔍 Checking for existing employee code:", emp_code);
+    const existingEmp = await pool.query("SELECT * FROM emp_details WHERE emp_code = $1", [emp_code]);
+    if (existingEmp.rows.length > 0) {
+      console.log("❌ Employee code already exists:", emp_code);
+      return res.status(400).json({ error: "Employee code already exists" });
+    }
 
+    console.log("💾 Inserting employee into database...");
+    
+    // Handle mobile number - store as text to avoid integer overflow
+    let mobileValue = null;
+    if (mobile && mobile.trim()) {
+      const mobileStr = String(mobile).trim();
+      // Remove any non-numeric characters except + for international numbers
+      const cleanMobile = mobileStr.replace(/[^\d+]/g, '');
+      if (cleanMobile.length > 0) {
+        mobileValue = cleanMobile;
+        console.log("📱 Processed mobile number:", mobileValue);
+      } else {
+        console.log("⚠️ Invalid mobile number format, skipping:", mobileStr);
+      }
+    }
+    
+    // Handle date of joining - use provided date or null
+    let dateValue = null;
+    if (date_of_joining && date_of_joining.trim()) {
+      // Ensure the date is in the correct format for PostgreSQL
+      const dateStr = date_of_joining.trim();
+      console.log("📅 Original date string:", dateStr);
+      
+      // If it's a valid date string, use it as-is
+      if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        // Format the date to avoid timezone issues
+        const [year, month, day] = dateStr.split('-');
+        dateValue = `${year}-${month}-${day}`;
+        console.log("📅 Valid date format, using:", dateValue);
+      } else {
+        console.log("⚠️ Invalid date format, skipping date");
+      }
+    }
+    
+    console.log("📅 Final date value being inserted:", dateValue);
+    
+    // Use different SQL based on whether we have a date or not
+    let result;
+    if (dateValue) {
+      result = await pool.query(
+        `INSERT INTO emp_details (emp_code, name, email, department, position, mobile, date_of_joining) 
+         VALUES ($1, $2, $3, $4, $5, $6, $7::date) RETURNING *`,
+        [emp_code, name, email, department, position, mobileValue, dateValue]
+      );
+    } else {
+      result = await pool.query(
+        `INSERT INTO emp_details (emp_code, name, email, department, position, mobile, date_of_joining) 
+         VALUES ($1, $2, $3, $4, $5, $6, NULL) RETURNING *`,
+        [emp_code, name, email, department, position, mobileValue]
+      );
+    }
+
+    console.log("✅ Employee added successfully:", result.rows[0]);
+    console.log("📅 Date returned from database:", result.rows[0].date_of_joining);
     res.json(result.rows[0]);
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Server error");
+    console.error("❌ Error adding employee:", err.message);
+    console.error("❌ Full error:", err);
+    res.status(500).json({ error: "Server error", details: err.message });
   }
 });
 

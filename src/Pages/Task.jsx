@@ -272,12 +272,13 @@ function Task(props) {
             <th>Assigned At</th>
             <th>Assigned From</th>
             <th>Status</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {displayedTasks.length === 0 ? (
             <tr>
-              <td colSpan="8" style={{ textAlign: "center" }}>
+              <td colSpan="9" style={{ textAlign: "center" }}>
                 No tasks found
               </td>
             </tr>
@@ -296,6 +297,14 @@ function Task(props) {
                 <td>{formatToIST(task.created_at)}</td>
                 <td>{task.assigned_from}</td>
                 <td>{task.status}</td>
+                <td>
+                  <button className="delete-btn" onClick={() => {
+                    if (window.confirm('Are you sure you want to delete this task?')) {
+                      // Add delete functionality here if needed
+                      console.log('Delete task:', task.task_id);
+                    }
+                  }}>Delete</button>
+                </td>
               </tr>
             ))
           )}
