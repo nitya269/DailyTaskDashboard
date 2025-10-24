@@ -408,19 +408,21 @@ function EmployeeDashboard() {
             className="back-btn" 
             onClick={() => navigate('/admin-dashboard')}
             style={{
-              marginBottom: '20px',
-              padding: '8px 16px',
+              margin: '0 0 20px 20px',
+              padding: '10px 20px',
               background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
               color: 'white',
               border: 'none',
-              borderRadius: '6px',
+              borderRadius: '8px',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
-              fontWeight: '500',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-              transition: 'all 0.2s ease'
+              fontWeight: '600',
+              fontSize: '14px',
+              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+              transition: 'all 0.2s ease',
+              height: '40px'
             }}
           >
             <span>←</span> Back to Admin Dashboard
