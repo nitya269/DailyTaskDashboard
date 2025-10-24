@@ -177,17 +177,16 @@ export default function TaskAssignForm({ setActivePage }) {
   }, [filter, tasks]);
 
   // -----------------------------
-  // Convert UTC to IST
+  // Convert UTC to IST and format as DD-MM-YYYY
   // -----------------------------
   const formatToIST = (dateString) => {
     if (!dateString) return "-";
     const date = new Date(dateString);
     const istDate = new Date(date.getTime() + 5.5 * 60 * 60 * 1000);
-    return istDate.toLocaleString('en-IN', {
-      day: '2-digit', month: '2-digit', year: 'numeric',
-      hour: '2-digit', minute: '2-digit', second: '2-digit',
-      hour12: true
-    });
+    const day = String(istDate.getDate()).padStart(2, '0');
+    const month = String(istDate.getMonth() + 1).padStart(2, '0');
+    const year = istDate.getFullYear();
+    return `${day}-${month}-${year}`;
   };
 
   // -----------------------------
@@ -411,7 +410,7 @@ export default function TaskAssignForm({ setActivePage }) {
         <table className="task-table">
           <thead>
             <tr>
-              <th>ID</th>
+              <th>S.No</th>
               <th>Employee</th>
               <th>Project</th>
               <th>Module</th>
@@ -425,12 +424,12 @@ export default function TaskAssignForm({ setActivePage }) {
           <tbody>
             {filteredTasks.length === 0 ? (
               <tr>
-                <td colSpan="10">No tasks found</td>
+                <td colSpan="9">No tasks found</td>
               </tr>
             ) : (
-              filteredTasks.map((task) => (
+              filteredTasks.map((task, index) => (
                 <tr key={task.task_id}>
-                  <td>{task.task_id}</td>
+                  <td>{index + 1}</td>
                   <td>{task.emp_name} ({task.emp_code})</td>
                   <td>{task.project}</td>
                   <td>{task.module}</td>

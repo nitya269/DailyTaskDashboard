@@ -48,7 +48,7 @@ app.post("/api/login", async (req, res) => {
 
     // 1️⃣ Check if user exists in admin table
     const adminResult = await pool.query(
-      "SELECT id, username, password, role, created_at FROM admin WHERE username = $1",
+      "SELECT username, password, role, created_at FROM admin WHERE username = $1",
       [trimmedUsername]
     );
 
@@ -67,7 +67,7 @@ app.post("/api/login", async (req, res) => {
     );
 
       userData = {
-        id: adminUser.id,
+        id: null,
         emp_code: adminUser.username,
         username: adminUser.username,
         role: adminUser.role,
@@ -80,7 +80,7 @@ app.post("/api/login", async (req, res) => {
     } else {
       // Check employee table
       const empResult = await pool.query(
-        "SELECT emp_code, name, department,position, password FROM emp_details WHERE emp_code = $1",
+        "SELECT id, emp_code, name, department,position, password FROM emp_details WHERE emp_code = $1",
         [username]
       );
 
@@ -95,7 +95,7 @@ app.post("/api/login", async (req, res) => {
 
       role = "employee";
       userData = {
-        id: null, // employee table may not have id
+        id: empUser.id, // employee table may not have id
         emp_code: empUser.emp_code,
         username: empUser.emp_code,
         role: role,
@@ -132,19 +132,83 @@ async function generateEmpCode() {
 // Add new employee
 app.post("/api/emp_details", async (req, res) => {
   try {
-    const { name, email, department, position } = req.body;
-    const emp_code = await generateEmpCode();
+    console.log("📝 Received employee data:", req.body);
+    console.log("📅 Raw date_of_joining from frontend:", req.body.date_of_joining);
+    const { emp_code, name, email, department, position, mobile, date_of_joining } = req.body;
+    
+    // Validate required fields
+    if (!emp_code || !name || !email || !department || !position) {
+      console.log("❌ Missing required fields:", { emp_code, name, email, department, position });
+      return res.status(400).json({ error: "Missing required fields" });
+    }
 
-    const result = await pool.query(
-      `INSERT INTO emp_details (emp_code, name, email, department, position) 
-       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-      [emp_code, name, email, department, position]
-    );
+    // Check if employee code already exists
+    console.log("🔍 Checking for existing employee code:", emp_code);
+    const existingEmp = await pool.query("SELECT * FROM emp_details WHERE emp_code = $1", [emp_code]);
+    if (existingEmp.rows.length > 0) {
+      console.log("❌ Employee code already exists:", emp_code);
+      return res.status(400).json({ error: "Employee code already exists" });
+    }
 
+    console.log("💾 Inserting employee into database...");
+    
+    // Handle mobile number - store as text to avoid integer overflow
+    let mobileValue = null;
+    if (mobile && mobile.trim()) {
+      const mobileStr = String(mobile).trim();
+      // Remove any non-numeric characters except + for international numbers
+      const cleanMobile = mobileStr.replace(/[^\d+]/g, '');
+      if (cleanMobile.length > 0) {
+        mobileValue = cleanMobile;
+        console.log("📱 Processed mobile number:", mobileValue);
+      } else {
+        console.log("⚠️ Invalid mobile number format, skipping:", mobileStr);
+      }
+    }
+    
+    // Handle date of joining - use provided date or null
+    let dateValue = null;
+    if (date_of_joining && date_of_joining.trim()) {
+      // Ensure the date is in the correct format for PostgreSQL
+      const dateStr = date_of_joining.trim();
+      console.log("📅 Original date string:", dateStr);
+      
+      // If it's a valid date string, use it as-is
+      if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        // Format the date to avoid timezone issues
+        const [year, month, day] = dateStr.split('-');
+        dateValue = `${year}-${month}-${day}`;
+        console.log("📅 Valid date format, using:", dateValue);
+      } else {
+        console.log("⚠️ Invalid date format, skipping date");
+      }
+    }
+    
+    console.log("📅 Final date value being inserted:", dateValue);
+    
+    // Use different SQL based on whether we have a date or not
+    let result;
+    if (dateValue) {
+      result = await pool.query(
+        `INSERT INTO emp_details (emp_code, name, email, department, position, mobile, date_of_joining) 
+         VALUES ($1, $2, $3, $4, $5, $6, $7::date) RETURNING *`,
+        [emp_code, name, email, department, position, mobileValue, dateValue]
+      );
+    } else {
+      result = await pool.query(
+        `INSERT INTO emp_details (emp_code, name, email, department, position, mobile, date_of_joining) 
+         VALUES ($1, $2, $3, $4, $5, $6, NULL) RETURNING *`,
+        [emp_code, name, email, department, position, mobileValue]
+      );
+    }
+
+    console.log("✅ Employee added successfully:", result.rows[0]);
+    console.log("📅 Date returned from database:", result.rows[0].date_of_joining);
     res.json(result.rows[0]);
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Server error");
+    console.error("❌ Error adding employee:", err.message);
+    console.error("❌ Full error:", err);
+    res.status(500).json({ error: "Server error", details: err.message });
   }
 });
 
@@ -162,10 +226,26 @@ app.get("/api/emp_details", async (req, res) => {
 app.delete("/api/emp_details/:id", async (req, res) => {
   try {
     const { id } = req.params;
+    
+    // First, get the employee's emp_code before deletion
+    const empResult = await pool.query("SELECT emp_code FROM emp_details WHERE id = $1", [id]);
+    
+    if (empResult.rows.length === 0) {
+      return res.status(404).json({ success: false, message: "Employee not found" });
+    }
+    
+    const empCode = empResult.rows[0].emp_code;
+    
+    // Delete all tasks associated with this employee first
+    await pool.query("DELETE FROM task_details WHERE emp_code = $1", [empCode]);
+    
+    // Then delete the employee
     await pool.query("DELETE FROM emp_details WHERE id = $1", [id]);
-    res.json({ message: "Employee deleted" });
+    
+    res.json({ success: true, message: "Employee and associated tasks deleted successfully" });
   } catch (err) {
-    res.status(500).send(err.message);
+    console.error("Error deleting employee:", err);
+    res.status(500).json({ success: false, message: "Server error", error: err.message });
   }
 });
 

@@ -26,8 +26,12 @@
 
 /* Back Button - Enhanced with Background Color */
 .employee-dashboard-wrapper .back-btn {
-  display: inline-flex;
+
+  
+   /* Moves content to the left */
+  margin-left:-99px;
   align-items: center;
+  padding: 1rem;
   gap: var(--space-2);
   padding: var(--space-3) var(--space-5);
   background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
@@ -464,6 +468,8 @@
 }
 
 .employee-dashboard-wrapper .task-table-header h3 {
+  text-align:center;
+  width:100%;
   font-size: var(--text-xl);
   font-weight: var(--font-semibold);
   color: var(--gray-900);

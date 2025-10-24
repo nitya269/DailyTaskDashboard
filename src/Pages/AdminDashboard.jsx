@@ -1,15 +1,16 @@
+
 import "./AdminDashboard.css";
 import * as XLSX from "xlsx";
 import Active from "./Active";
 import DashboardHeader from "./DashboardHeader";
 import Footer from "./Footer";
-import Header from "./Header";
-import React, { useEffect, useState } from "react";
 import Task from "./Task";
 import TaskAssignForm from "./TaskAssignForm";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { saveAs } from "file-saver";
 import { useNavigate } from "react-router-dom";
+import WeatherWidget from "../Components/WeatherWidget";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -28,8 +29,25 @@ export default function AdminDashboard() {
   const [loadingCard, setLoadingCard] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState({});
+
+  // Date formatting function to convert ISO date to DD-MM-YYYY format
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    try {
+      const date = new Date(dateString);
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      return `${day}-${month}-${year}`;
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return dateString; // Return original string if formatting fails
+    }
+  };
 
   const [form, setForm] = useState({
+    id: "",
     emp_code: "",
     name: "",
     email: "",
@@ -45,12 +63,16 @@ export default function AdminDashboard() {
       const normalized = res.data.map(emp => {
         const uniqueId = emp.id ?? emp.emp_code ?? crypto.randomUUID();
         return {
+          id: uniqueId, // Frontend ID for React keys
+          db_id: emp.id, // Database ID for API calls
           emp_code: emp.emp_code ?? uniqueId,
           name: emp.name ?? "",
           email: emp.email ?? "",
           department: emp.department ?? "",
           position: emp.position ?? "",
-          id: uniqueId,
+          mobile: emp.mobile ?? "",
+          date_of_joining: emp.date_of_joining ?? "",
+          
         };
       });
       setEmployees(normalized);
@@ -75,11 +97,11 @@ export default function AdminDashboard() {
         axios.get("http://localhost:5000/api/emp_details"),
         axios.get("http://localhost:5000/api/tasks")
       ]);
-      
+
       const statsData = statsRes.data || {};
       const allEmployees = employeesRes.data || [];
       const allTasks = tasksRes.data || [];
-      
+
       const activeEmployees = allEmployees.filter(emp => {
         const employeeTasks = allTasks.filter(task => task.emp_code === emp.emp_code);
         return employeeTasks.length > 0 && employeeTasks.every(task => task.status === 'Completed');
@@ -128,50 +150,103 @@ export default function AdminDashboard() {
   }, []);
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    
+    // Mobile number validation
+    if (name === 'mobile') {
+      // Only allow numbers and limit to 10 digits
+      const numericValue = value.replace(/\D/g, ''); // Remove non-numeric characters
+      if (numericValue.length <= 10) {
+        setForm({ ...form, [name]: numericValue });
+      }
+    } else {
+      setForm({ ...form, [name]: value });
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    if (!form.name || !form.email || !form.department || !form.position) {
-      alert("Please fill all fields");
+    if (!form.emp_code || !form.name || !form.email || !form.department || !form.position) {
+      alert("Please fill all required fields");
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Mobile number validation
+    if (form.mobile && form.mobile.length !== 10) {
+      alert("Mobile number must be exactly 10 digits");
       setIsSubmitting(false);
       return;
     }
 
     try {
+      console.log("📤 Sending employee data:", form);
+      console.log("📅 Date of joining being sent:", form.date_of_joining);
+      console.log("📱 Mobile number being sent:", form.mobile);
       const res = await axios.post("http://localhost:5000/api/emp_details", form);
+      console.log("📥 Received response:", res.data);
+      console.log("📅 Date of joining in response:", res.data.date_of_joining);
+      console.log("📱 Mobile number in response:", res.data.mobile);
       const newEmp = {
-        emp_code:res.data.emp_code ?? "",
+        emp_code: res.data.emp_code ?? "",
         name: res.data.name ?? "",
         email: res.data.email ?? "",
         department: res.data.department ?? "",
         position: res.data.position ?? "",
-        mobile:res.data.mobile ?? "",
-        date_of_joining:res.data.date_of_joining ?? "",
+        mobile: res.data.mobile ?? "",
+        date_of_joining: res.data.date_of_joining ?? "",
       };
       setEmployees(prev => [...prev, newEmp]);
-      setForm({ name: "", email: "", department: "", position: "" });
+      setForm({ emp_code: "", name: "", email: "", department: "", position: "", mobile: "", date_of_joining: "" });
       setActivePage("employees");
       setSuccessMessage("Employee added successfully!");
       setTimeout(() => setSuccessMessage(""), 3000);
       fetchStats();
     } catch (err) {
-      console.error("Error adding employee:", err);
+      console.error("❌ Error adding employee:", err);
+      console.error("❌ Error response:", err.response?.data);
+      alert(`Error adding employee: ${err.response?.data?.error || err.message || 'Unknown error'}`);
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const deleteEmployee = async (id) => {
+    console.log("🗑️ Attempting to delete employee with ID:", id);
+    
+    if (!id) {
+      console.error("❌ No ID provided for deletion");
+      alert("Error: No employee ID found for deletion");
+      return;
+    }
+    
+    if (isDeleting[id]) return; // Prevent multiple clicks
+    
+    const confirmDelete = window.confirm("Are you sure you want to delete this employee?");
+    if (!confirmDelete) return;
+    
+    setIsDeleting(prev => ({ ...prev, [id]: true }));
+    
     try {
-      await axios.delete(`http://localhost:5000/api/emp_details/${id}`);
-      fetchEmployees();
-      fetchStats();
+      console.log("🗑️ Sending delete request for ID:", id);
+      const response = await axios.delete(`http://localhost:5000/api/emp_details/${id}`);
+      
+      if (response.data.success) {
+        console.log("✅ Employee deleted successfully:", response.data.message);
+        fetchEmployees();
+        fetchStats();
+      } else {
+        console.error("❌ Delete failed:", response.data.message);
+        alert(`Error: ${response.data.message}`);
+      }
     } catch (err) {
       console.error("Error deleting employee:", err);
+      const errorMessage = err.response?.data?.message || "Error deleting employee. Please try again.";
+      alert(errorMessage);
+    } finally {
+      setIsDeleting(prev => ({ ...prev, [id]: false }));
     }
   };
 
@@ -252,40 +327,41 @@ export default function AdminDashboard() {
     <div className="admin-dashboard-wrapper">
       <DashboardHeader currentUser={null} />
       <div className="container">
-        {/* Nav bar - FIXED: Added the button here */}
-      <div className="nav-bars">
-  <button
-    onClick={() => { showEmployees(); setActivePage("employees"); }}
-    className={`nav-btn ${activePage === "employees" ? "active" : ""}`}
-  >
-    Manage Employees
-  </button>
+        {/* Weather Widget - Only show on dashboard page */}
+        {activePage === "dashboard" && <WeatherWidget />}
 
-  <button
-    onClick={() => { showTasks(); setActivePage("tasks"); }}
-    className={`nav-btn ${activePage === "tasks" ? "active" : ""}`}
-  >
-    Assign Tasks
-  </button>
+        {/* Nav bar */}
+        <div className="nav-bars">
+          <button
+            onClick={() => { showEmployees(); setActivePage("employees"); }}
+            className={`nav-btn ${activePage === "employees" ? "active" : ""}`}
+          >
+            Manage Employees
+          </button>
 
-  <button
-    onClick={() => { navigate('/employee-dashboard/admin'); setActivePage("viewDashboard"); }}
-    className={`nav-btn ${activePage === "viewDashboard" ? "active" : ""}`}
-  >
-    View Employee Dashboard
-  </button>
+          <button
+            onClick={() => { showTasks(); setActivePage("tasks"); }}
+            className={`nav-btn ${activePage === "tasks" ? "active" : ""}`}
+          >
+            Assign Tasks
+          </button>
 
-  <button
-    onClick={() => { navigate('/report'); setActivePage("report"); }}
-    className={`nav-btn ${activePage === "report" ? "active" : ""}`}
-  >
-    Report
-  </button>
-</div>
+          <button
+            onClick={() => { navigate('/employee-dashboard/admin'); setActivePage("viewDashboard"); }}
+            className={`nav-btn ${activePage === "viewDashboard" ? "active" : ""}`}
+          >
+            View Employee Dashboard
+          </button>
 
+          <button
+            onClick={() => { navigate('/report'); setActivePage("report"); }}
+            className={`nav-btn ${activePage === "report" ? "active" : ""}`}
+          >
+            Report
+          </button>
+        </div>
 
-  
-        {/* Dashboard */}
+        {/* Dashboard Section */}
         {activePage === "dashboard" && (
           <div className="dashboard-section">
             <h3><b>DASHBOARD</b></h3>
@@ -323,12 +399,12 @@ export default function AdminDashboard() {
             )}
 
             {filterCard === "totalEmployees" && (
-              <div className="task-list-container">
+              <div className="task-list-container total-employees-table">
                 <h3>All Employees</h3>
                 <table className="task-table">
                   <thead>
                     <tr>
-                      <th>ID</th>
+                      <th>S.No</th>
                       <th>Employee Name</th>
                       <th>Designation</th>
                       <th>Department</th>
@@ -341,19 +417,7 @@ export default function AdminDashboard() {
                         <td>{emp.name}</td>
                         <td>{emp.position || 'N/A'}</td>
                         <td>
-                          <span style={{
-                            padding: '4px 12px',
-                            borderRadius: '12px',
-                            backgroundColor: '#e3f2fd',
-                            color: '#1976d2',
-                            fontSize: '0.85em',
-                            fontWeight: '500',
-                            display: 'inline-block',
-                            minWidth: '100px',
-                            textAlign: 'center'
-                          }}>
-                            {emp.department || 'N/A'}
-                          </span>
+                          <span className="department-badge">{emp.department || 'N/A'}</span>
                         </td>
                       </tr>
                     ))}
@@ -362,29 +426,10 @@ export default function AdminDashboard() {
               </div>
             )}
 
-            {filterCard === "totalTasks" && (
-              <div className="tasks-wrapper">
-                <Task taskType="totalTasks" tasks={tasks} />
-              </div>
-            )}
-
-            {filterCard === "pendingTasks" && (
-              <div className="tasks-wrapper">
-                <Task taskType="pendingTasks" tasks={tasks} /> 
-              </div>
-            )}
-
-            {filterCard === "completedTasks" && (
-              <div className="tasks-wrapper">
-                <Task taskType="completedTasks" tasks={tasks} />
-              </div>
-            )}
-
-            {filterCard === "activeEmployees" && (
-              <div className="active-employees-wrapper">
-                <Active employees={employees} tasks={tasks} />
-              </div>   
-            )}
+            {filterCard === "totalTasks" && <div className="tasks-wrapper"><Task taskType="totalTasks" tasks={tasks} showFilters={true} /></div>}
+            {filterCard === "pendingTasks" && <div className="tasks-wrapper"><Task taskType="pendingTasks" tasks={tasks} showFilters={false} /></div>}
+            {filterCard === "completedTasks" && <div className="tasks-wrapper"><Task taskType="completedTasks" tasks={tasks} showFilters={false} /></div>}
+            {filterCard === "activeEmployees" && <div className="active-employees-wrapper"><Active employees={employees} tasks={tasks} /></div>}
           </div>
         )}
 
@@ -399,8 +444,8 @@ export default function AdminDashboard() {
               <div className="form-grid">
                 <div className="form-row">
                   <div className="form-field">
-                    <labe>Employee Code</labe>
-                    <input type="text" name="emp_code" placeholder="Enter employee code" value={form.emp_code} onChange={handleChange} required disabled={isSubmitting} />
+                    <label>Employee Code</label>
+                    <input type="text" name="emp_code" placeholder="Enter employee code (e.g., DS001)" value={form.emp_code} onChange={handleChange} required disabled={isSubmitting} />
                   </div>
                   <div className="form-field">
                     <label>Employee Name</label>
@@ -425,13 +470,15 @@ export default function AdminDashboard() {
                     <label>Position</label>
                     <input type="text" name="position" placeholder="Enter position" value={form.position} onChange={handleChange} required disabled={isSubmitting} />
                   </div>
-                  <label>Mobile</label>
-                  <input type="text" name="mobile" placeholder="Enter mobile number" value={form.mobile} onChange={handleChange} required disabled={isSubmitting} />
+                  <div className="form-field">
+                    <label>Mobile</label>
+                    <input type="tel" name="mobile" placeholder="Enter 10-digit mobile number" value={form.mobile} onChange={handleChange} maxLength="10" required disabled={isSubmitting} />
+                  </div>
                 </div>
                 <div className="form-row">
                   <div className="form-field">
                     <label>Date of Joining</label>
-                    <input type="date" name="date_of_joining" placeholder="Enter date of joining" value={form.date_of_joining} onChange={handleChange} required disabled={isSubmitting} />
+                    <input type="date" name="date_of_joining" value={form.date_of_joining} onChange={handleChange} required disabled={isSubmitting} />
                   </div>
                 </div>
               </div>
@@ -451,6 +498,7 @@ export default function AdminDashboard() {
               <table className="employee-table">
                 <thead>
                   <tr>
+                    <th>S.No</th>
                     <th>Employee Code</th>
                     <th>Name</th>
                     <th>Email</th>
@@ -459,21 +507,27 @@ export default function AdminDashboard() {
                     <th>Mobile</th>
                     <th>Date of Joining</th>
                     <th>Actions</th>
-                    <th></th>
                   </tr>
                 </thead>
                 <tbody>
-                  {employees.map(emp => (
-                    <tr key={emp.id}>
+                  {employees.map((emp, index) => (
+                    <tr key={emp.id || emp.emp_code || `emp-${index}`}>
+                      <td>{index + 1}</td>
                       <td>{emp.emp_code}</td>
                       <td>{emp.name}</td>
                       <td>{emp.email}</td>
                       <td>{emp.department}</td>
                       <td>{emp.position}</td>
                       <td>{emp.mobile}</td>
-                      <td>{emp.date_of_joining}</td>  
+                      <td>{formatDate(emp.date_of_joining)}</td>  
                       <td>
-                        <button onClick={() => deleteEmployee(emp.id)}>Delete</button>
+                        <button 
+                          className="delete-btn" 
+                          onClick={() => deleteEmployee(emp.db_id)}
+                          disabled={isDeleting[emp.db_id]}
+                        >
+                          {isDeleting[emp.db_id] ? "Deleting..." : "Delete"}
+                        </button>
                       </td>
                     </tr>
                   ))}

@@ -139,20 +139,15 @@ function Task(props) {
     setFilteredTasks(result);
   }, [filter, tasks]);
 
-  // Convert UTC to IST
+  // Convert UTC to IST and format as DD-MM-YYYY
   const formatToIST = (dateString) => {
     if (!dateString) return "-";
     const date = new Date(dateString);
     const istDate = new Date(date.getTime() + 5.5 * 60 * 60 * 1000);
-    return istDate.toLocaleString("en-IN", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: true
-    });
+    const day = String(istDate.getDate()).padStart(2, '0');
+    const month = String(istDate.getMonth() + 1).padStart(2, '0');
+    const year = istDate.getFullYear();
+    return `${day}-${month}-${year}`;
   };
 
   const pendingTasks = tasks.filter(task => task.status === "Pending");
@@ -231,8 +226,8 @@ function Task(props) {
         </div>
 
       {/* Filters */}
-      <div className="filters">
-        {props.showFilters && (
+      {props.showFilters && (
+        <div className="filters">
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 10, alignItems: "center" }}>
             <select value={filter.employee} onChange={e => setFilter({ ...filter, employee: e.target.value })}>
               <option value="">Filter by Name</option>
@@ -257,14 +252,14 @@ function Task(props) {
             <input type="text" placeholder="Search task/module/submodule" value={filter.search} onChange={e => setFilter({ ...filter, search: e.target.value })} />
             <button onClick={() => setFilter({ employee: "", project: "", status: "", fromDate: "", toDate: "", search: "" })}>Clear</button>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Tasks Table */}
       <table className="task-table">
         <thead>
           <tr>
-            <th>ID</th>
+            <th>S.No</th>
             <th>Employee</th>
             <th>Project</th>
             <th>Module</th>
@@ -272,19 +267,20 @@ function Task(props) {
             <th>Assigned At</th>
             <th>Assigned From</th>
             <th>Status</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {displayedTasks.length === 0 ? (
             <tr>
-              <td colSpan="8" style={{ textAlign: "center" }}>
+              <td colSpan="9" style={{ textAlign: "center" }}>
                 No tasks found
               </td>
             </tr>
           ) : (
-            displayedTasks.map((task) => (
+            displayedTasks.map((task, index) => (
               <tr key={task.task_id}>
-                <td>{task.task_id}</td>
+                <td>{index + 1}</td>
                 <td>
                   {task.emp_name} ({task.emp_code})
                 </td>
@@ -296,6 +292,14 @@ function Task(props) {
                 <td>{formatToIST(task.created_at)}</td>
                 <td>{task.assigned_from}</td>
                 <td>{task.status}</td>
+                <td>
+                  <button className="delete-btn" onClick={() => {
+                    if (window.confirm('Are you sure you want to delete this task?')) {
+                      // Add delete functionality here if needed
+                      console.log('Delete task:', task.task_id);
+                    }
+                  }}>Delete</button>
+                </td>
               </tr>
             ))
           )}

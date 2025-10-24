@@ -86,8 +86,14 @@ const Active = ({ employees: employeesProp, tasks: tasksProp }) => {
         <table className="task-table">
           <thead>
             <tr>
-              <th>ID</th>
+              <th>S.No</th>
+              <th>Employee Code</th>
               <th>Employee Name</th>
+              <th>Department</th>
+              <th>Position</th>
+              <th>Email</th>
+              <th>Mobile</th>
+              <th>Completed Tasks</th>
               <th>Status</th>
             </tr>
           </thead>
@@ -95,7 +101,13 @@ const Active = ({ employees: employeesProp, tasks: tasksProp }) => {
             {activeEmployees.map((employee, index) => (
               <tr key={employee.emp_code}>
                 <td>{index + 1}</td>
+                <td>{employee.emp_code}</td>
                 <td>{employee.name}</td>
+                <td>{employee.department || 'N/A'}</td>
+                <td>{employee.position || 'N/A'}</td>
+                <td>{employee.email || 'N/A'}</td>
+                <td>{employee.mobile || 'N/A'}</td>
+                <td>{employee.tasks ? employee.tasks.length : 0}</td>
                 <td>
                   <span style={{
                     padding: '4px 12px',
