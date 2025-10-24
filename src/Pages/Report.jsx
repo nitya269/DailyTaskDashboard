@@ -36,7 +36,8 @@ export default function Report() {
         <div className="table-header">
           <button className="back-btn" onClick={() => navigate(-1)}>← Back</button>
           <button className="download-btn" style={{ backgroundColor: '#28a745' }} onClick={() => {
-            const rows = (visibleTasks.length ? visibleTasks : tasks).map(t => ({
+            const rows = (visibleTasks.length ? visibleTasks : tasks).map((t, index) => ({
+              "S.No": index + 1,
               Name: t.emp_name,
               Project: t.project,
               Module: t.module,
