@@ -64,7 +64,7 @@
 
 /* Filter Label */
 .admin-dashboard-wrapper .filters::before {
-  content: "Apply Filters";
+  /*content: "Apply Filters";*/
   display: block;
   font-size: 18px;
   font-weight: 600;
