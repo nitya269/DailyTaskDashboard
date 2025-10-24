@@ -401,10 +401,31 @@ function EmployeeDashboard() {
   return (
     <div className="employee-dashboard-wrapper">
       <DashboardHeader currentUser={emp} />
-      <WeatherWidget />
+      {!isAdminView && <WeatherWidget />}
       <div className="employee-dashboard-container">
-        <button className="back-btn" onClick={() => (isAdminView ? navigate('/admin-dashboard') : navigate(-1))}>← Back</button>
-
+        {isAdminView && (
+          <button 
+            className="back-btn" 
+            onClick={() => navigate('/admin-dashboard')}
+            style={{
+              marginBottom: '20px',
+              padding: '8px 16px',
+              background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              fontWeight: '500',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+              transition: 'all 0.2s ease'
+            }}
+          >
+            <span>←</span> Back to Admin Dashboard
+          </button>
+        )}
         {/* Top row: Task Summary Cards */}
         <div className="top-row">
           <div className="task-summary-cards">
