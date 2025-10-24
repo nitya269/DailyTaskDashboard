@@ -57,6 +57,7 @@ function EmployeeDashboard() {
   const [success, setSuccess] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [taskFilter, setTaskFilter] = useState("All");
+  const [isDateFiltered, setIsDateFiltered] = useState(false);
 
   const [form, setForm] = useState({
     emp_code: "",
@@ -388,15 +389,27 @@ function EmployeeDashboard() {
     return weeks;
   };
 
-  // Task counts
-  const totalTasks = filteredTasks.length;
-  const pendingTasks = filteredTasks.filter(t => t.status === "Pending").length;
-  const inProgressTasks = filteredTasks.filter(t => t.status === "In Progress").length;
-  const completedTasks = filteredTasks.filter(t => t.status === "Completed").length;
+  // Task counts - Cards should show TOTAL counts (not filtered by date)
+  const totalTasks = tasks.length;
+  const pendingTasks = tasks.filter(t => t.status === "Pending").length;
+  const inProgressTasks = tasks.filter(t => t.status === "In Progress").length;
+  const completedTasks = tasks.filter(t => t.status === "Completed").length;
 
-  const displayedTasks = taskFilter === "All"
-    ? filteredTasks
-    : filteredTasks.filter(t => t.status === taskFilter);
+  // Determine what tasks to display based on current filter and date selection
+  const getDisplayedTasks = () => {
+    if (isDateFiltered) {
+      // When a date is selected, show tasks for that date only
+      return filteredTasks;
+    } else if (taskFilter === "All") {
+      // When "Total Tasks" is selected, show ALL tasks (not filtered by date)
+      return tasks;
+    } else {
+      // When specific status is selected, show ALL tasks of that status (not filtered by date)
+      return tasks.filter(t => t.status === taskFilter);
+    }
+  };
+
+  const displayedTasks = getDisplayedTasks();
 
   return (
     <div className="employee-dashboard-wrapper">
@@ -433,7 +446,10 @@ function EmployeeDashboard() {
           <div className="task-summary-cards">
             <div
               className={`summary-card total ${taskFilter === "All" ? "active" : ""}`}
-              onClick={() => setTaskFilter("All")}
+              onClick={() => {
+                setTaskFilter("All");
+                setIsDateFiltered(false); // Clear date filter flag
+              }}
             >
               <h4>Total Tasks</h4>
               <p>{totalTasks}</p>
@@ -441,7 +457,10 @@ function EmployeeDashboard() {
 
             <div
               className={`summary-card in-progress ${taskFilter === "In Progress" ? "active" : ""}`}
-              onClick={() => setTaskFilter("In Progress")}
+              onClick={() => {
+                setTaskFilter("In Progress");
+                setIsDateFiltered(false); // Clear date filter flag
+              }}
             >
               <h4>In Progress</h4>
               <p>{inProgressTasks}</p>
@@ -449,7 +468,10 @@ function EmployeeDashboard() {
 
             <div
               className={`summary-card pending ${taskFilter === "Pending" ? "active" : ""}`}
-              onClick={() => setTaskFilter("Pending")}
+              onClick={() => {
+                setTaskFilter("Pending");
+                setIsDateFiltered(false); // Clear date filter flag
+              }}
             >
               <h4>Pending</h4>
               <p>{pendingTasks}</p>
@@ -457,7 +479,10 @@ function EmployeeDashboard() {
 
             <div
               className={`summary-card completed ${taskFilter === "Completed" ? "active" : ""}`}
-              onClick={() => setTaskFilter("Completed")}
+              onClick={() => {
+                setTaskFilter("Completed");
+                setIsDateFiltered(false); // Clear date filter flag
+              }}
             >
               <h4>Completed</h4>
               <p>{completedTasks}</p>
@@ -579,7 +604,11 @@ function EmployeeDashboard() {
                       <div
                         key={idx}
                         className={className}
-                        onClick={!isFuture ? () => setSelectedDate(dateStr) : undefined}
+                        onClick={!isFuture ? () => {
+                          setSelectedDate(dateStr);
+                          setTaskFilter("All"); // Reset to show all tasks for the selected date
+                          setIsDateFiltered(true); // Set date filter flag
+                        } : undefined}
                       >
                         {day}
                       </div>
@@ -607,6 +636,7 @@ function EmployeeDashboard() {
           <table className="task-table">
             <thead>
               <tr>
+                <th>S.No</th>
                 <th>ID</th>
                 <th>Employee</th>
                 <th>Project</th>
@@ -622,11 +652,12 @@ function EmployeeDashboard() {
             <tbody>
               {displayedTasks.length === 0 ? (
                 <tr>
-                  <td colSpan="10" style={{ textAlign: "center" }}>No tasks found</td>
+                  <td colSpan="11" style={{ textAlign: "center" }}>No tasks found</td>
                 </tr>
               ) : (
                 displayedTasks.map((task, index) => (
                   <tr key={index}>
+                    <td>{index + 1}</td>
                     <td>{task.task_id}</td>
                     <td>{task.emp_name} ({task.emp_code})</td>
                     <td>{task.project}</td>
@@ -640,6 +671,8 @@ function EmployeeDashboard() {
                           setSelectedDate(formatISTDate(task.created_at));
                           setCurrentMonth(m);
                           setCurrentYear(y);
+                          setTaskFilter("All"); // Reset to show all tasks for the selected date
+                          setIsDateFiltered(true); // Set date filter flag
                         }}
                       >
                         {formatISTDateTime(task.created_at)}
