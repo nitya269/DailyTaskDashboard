@@ -126,11 +126,12 @@ function EmployeeDashboard() {
             (task) => task.emp_code?.toUpperCase() === selectedEmpCode.toUpperCase()
           );
         } else if (admStorage) {
+          // Show only tasks assigned TO the admin (not tasks assigned BY the admin)
           const adminCode = (admStorage.emp_code || "").toUpperCase();
           const adminUser = (admStorage.username || "").toUpperCase();
           filtered = allTasks.filter((task) => {
-            const from = (task.assigned_from || "").toUpperCase();
-            return from === adminCode || from === adminUser;
+            const empCode = (task.emp_code || "").toUpperCase();
+            return empCode === adminCode || empCode === adminUser;
           });
         }
       } else {
@@ -166,7 +167,26 @@ function EmployeeDashboard() {
   const fetchEmployees = async () => {
     try {
       const res = await axios.get(`${API_BASE}/emp_details`);
-      setEmployees(res.data || []);
+      const employeesData = res.data || [];
+      setEmployees(employeesData);
+      
+      // Auto-select admin's name after employees are loaded
+      if (isAdminView) {
+        const adminStorage = JSON.parse(localStorage.getItem("admin"));
+        if (adminStorage && adminStorage.emp_code) {
+          // Check if admin exists in the employees list
+          const adminExists = employeesData.find(emp => 
+            emp.emp_code?.toUpperCase() === adminStorage.emp_code?.toUpperCase()
+          );
+          if (adminExists) {
+            setSelectedEmpCode(adminStorage.emp_code);
+          } else {
+            // If admin not found in employees list, still set it for task assignment
+            console.log("Admin not found in employees list, but setting emp_code for task assignment");
+            setSelectedEmpCode(adminStorage.emp_code);
+          }
+        }
+      }
     } catch (err) {
       console.error("Error fetching employees:", err);
     }
@@ -190,7 +210,9 @@ function EmployeeDashboard() {
   useEffect(() => {
     fetchProjects();
     if (empCode) fetchTasks();
-    if (isAdminView) fetchEmployees();
+    if (isAdminView) {
+      fetchEmployees();
+    }
   }, [empCode]);
 
   // Refresh tasks when admin changes selected employee filter
@@ -230,12 +252,12 @@ function EmployeeDashboard() {
     let assignedFrom;
     
     if (isRealAdminView) {
-      // Admin is assigning task to selected employee
-      targetEmpCode = selectedEmpCode;
+      // Admin can only add tasks for themselves (restricted)
+      targetEmpCode = admin?.emp_code || selectedEmpCode;
       assignedFrom = admin?.emp_code || admin?.name || "admin";
       
       if (!targetEmpCode) {
-        alert("Please select an employee to assign the task.");
+        alert("Admin information not found. Please log in again.");
         setSubmitting(false);
         return;
       }
@@ -261,7 +283,7 @@ function EmployeeDashboard() {
       await axios.post(`${API_BASE}/tasks`, payload);
       setSuccess(true);
       setForm({ emp_code: "", project: "", module: "", submodule: "", task_details: "" });
-      if (isRealAdminView) setSelectedEmpCode("");
+      // Don't reset selectedEmpCode for admin - keep it selected
       setTimeout(() => setSuccess(false), 2500);
       fetchTasks();
     } catch (err) {
@@ -430,11 +452,10 @@ function EmployeeDashboard() {
                 {isAdminView && (
                   <div className="form-group">
                     <h5 className="style">Employee:</h5>
-                    <select name="emp_code" value={selectedEmpCode} onChange={(e) => setSelectedEmpCode(e.target.value)} required>
-                      <option value="">-- Select Employee --</option>
-                      {employees.map((em) => (
-                        <option key={em.emp_code || em.id} value={em.emp_code}>{em.name} ({em.emp_code})</option>
-                      ))}
+                    <select name="emp_code" value={selectedEmpCode} onChange={(e) => setSelectedEmpCode(e.target.value)} required disabled>
+                      <option value={selectedEmpCode}>
+                        {employees.find(emp => emp.emp_code === selectedEmpCode)?.name || 'Admin'} ({selectedEmpCode})
+                      </option>
                     </select>
                   </div>
                 )}
