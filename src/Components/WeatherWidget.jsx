@@ -310,41 +310,75 @@ const WeatherWidget = () => {
               )}
             </div>
           ) : (
-            <div className="hourly-forecast">
-              {hourlyForecast.length > 0 ? (
-                hourlyForecast.map((hour, index) => {
-                  const currentHour = new Date().getHours();
-                  const hourOfDay = (currentHour + index) % 24;
-                  const isDay = hourOfDay >= 6 && hourOfDay < 20;
-                  const isNextDay = currentHour + index >= 24;
-                  const isFirstHourOfDay = hourOfDay === 0;
-                  
-                  return (
-                    <React.Fragment key={index}>
-                      {isFirstHourOfDay && (
-                        <div className="day-divider">
-                          <span>Tomorrow</span>
-                        </div>
-                      )}
-                      <div className={`hourly-item ${isNextDay ? 'next-day' : ''}`}>
-                        <div className="hourly-time">
-                          {index === 0 ? 'Now' : isFirstHourOfDay ? '12 AM' : hour.time}
-                        </div>
-                        <div className="hourly-weather">
-                          <div className="hourly-icon">{getWeatherIcon(hour.code, isDay)}</div>
-                          <div className="hourly-temp">{Math.round(hour.temp)}°</div>
-                          <div className="hourly-condition">{weatherCodes[hour.code]}</div>
-                        </div>
-                        {hour.precipitation > 0 && (
-                          <div className="hourly-precipitation">💧 {hour.precipitation}%</div>
-                        )}
-                      </div>
-                    </React.Fragment>
-                  );
-                })
-              ) : (
-                <div className="no-hourly">Loading hourly forecast...</div>
-              )}
+            <div className="hourly-forecast-container">
+              {/* Today's Hours */}
+              <div className="hourly-forecast-box">
+                <div className="hourly-forecast-header">Today</div>
+                <div className="hourly-forecast">
+                  {hourlyForecast.length > 0 ? (
+                    hourlyForecast
+                      .filter((_, index) => index < 24 - new Date().getHours())
+                      .map((hour, index) => {
+                        const currentTime = new Date();
+                        const hourOfDay = (currentTime.getHours() + index) % 24;
+                        const isDay = hourOfDay >= 6 && hourOfDay < 20;
+                        
+                        return (
+                          <div key={`today-${index}`} className="hourly-item">
+                            <div className="hourly-time">
+                              {index === 0 ? 'Now' : hour.time}
+                            </div>
+                            <div className="hourly-weather">
+                              <div className="hourly-icon">{getWeatherIcon(hour.code, isDay)}</div>
+                              <div className="hourly-temp">{Math.round(hour.temp)}°</div>
+                              <div className="hourly-condition">{weatherCodes[hour.code]}</div>
+                            </div>
+                            {hour.precipitation > 0 && (
+                              <div className="hourly-precipitation">💧 {hour.precipitation}%</div>
+                            )}
+                          </div>
+                        );
+                      })
+                  ) : (
+                    <div className="no-hourly">Loading hourly forecast...</div>
+                  )}
+                </div>
+              </div>
+
+              {/* Tomorrow's Hours */}
+              <div className="hourly-forecast-box">
+                <div className="hourly-forecast-header">Tomorrow</div>
+                <div className="hourly-forecast">
+                  {hourlyForecast.length > 0 ? (
+                    hourlyForecast
+                      .filter((_, index) => index >= 24 - new Date().getHours())
+                      .map((hour, index, array) => {
+                        const hourIndex = index + (24 - new Date().getHours());
+                        const hourOfDay = hourIndex % 24;
+                        const isDay = hourOfDay >= 6 && hourOfDay < 20;
+                        const isFirstHour = index === 0;
+                        
+                        return (
+                          <div key={`tomorrow-${index}`} className="hourly-item next-day">
+                            <div className="hourly-time">
+                              {isFirstHour ? '12 AM' : hour.time}
+                            </div>
+                            <div className="hourly-weather">
+                              <div className="hourly-icon">{getWeatherIcon(hour.code, isDay)}</div>
+                              <div className="hourly-temp">{Math.round(hour.temp)}°</div>
+                              <div className="hourly-condition">{weatherCodes[hour.code]}</div>
+                            </div>
+                            {hour.precipitation > 0 && (
+                              <div className="hourly-precipitation">💧 {hour.precipitation}%</div>
+                            )}
+                          </div>
+                        );
+                      })
+                  ) : (
+                    <div className="no-hourly">Loading hourly forecast...</div>
+                  )}
+                </div>
+              </div>
             </div>
           )}
             </div>
