@@ -8,6 +8,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { saveAs } from "file-saver";
 import { useNavigate, useParams } from "react-router-dom";
+import WeatherWidget from "../Components/WeatherWidget";
 
 function EmployeeDashboard() {
   const navigate = useNavigate();
@@ -372,7 +373,7 @@ function EmployeeDashboard() {
   return (
     <div className="employee-dashboard-wrapper">
       <DashboardHeader currentUser={emp} />
-
+      <WeatherWidget />
       <div className="employee-dashboard-container">
         <button className="back-btn" onClick={() => (isAdminView ? navigate('/admin-dashboard') : navigate(-1))}>← Back</button>
 

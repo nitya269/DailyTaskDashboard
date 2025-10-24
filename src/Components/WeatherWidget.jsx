@@ -176,20 +176,38 @@ const WeatherWidget = () => {
 
   // Old weather effects function removed - now using video backgrounds
 
-  const getWeatherVideo = (code) => {
-    // Clear sky and sunny conditions
-    if (code === 0 || code === 1) return 'Sunny.mp4';
+  const getWeatherVideo = (code, isDay = true) => {
+    // Clear sky conditions
+    if (code === 0) return isDay ? 'Clear Sky.mp4' : 'Clear Night.mp4';
+    if (code === 1) return isDay ? 'Mostly Sunny.mp4' : 'Clear Night.mp4';
     
-    // Cloudy conditions
-    if (code >= 2 && code <= 3) return 'cloudy.mp4';
+    // Partly cloudy conditions
+    if (code === 2) return 'Partly Cloudy.mp4';
     
-    // Rainy conditions
-    if (code >= 51 && code <= 67) return 'rainy.mp4';
-    if (code >= 80 && code <= 82) return 'rainy.mp4';
-    if (code >= 95 && code <= 99) return 'rainy.mp4'; // Thunderstorms
+    // Overcast conditions
+    if (code === 3) return 'Overcast.mp4';
     
-    // Default to cloudy for other conditions
-    return 'cloudy.mp4';
+    // Foggy conditions
+    if (code >= 45 && code <= 48) return 'Fog.mp4';
+    
+    // Light rain/drizzle conditions
+    if (code >= 51 && code <= 55) return 'Showers.mp4';
+    if (code >= 56 && code <= 57) return 'Showers.mp4'; // Freezing drizzle
+    
+    // Moderate to heavy rain
+    if (code >= 61 && code <= 67) return 'Rain.mp4';
+    if (code >= 80 && code <= 82) return 'Showers.mp4'; // Rain showers
+    
+    // Snow conditions
+    if (code >= 71 && code <= 75) return 'Snow.mp4';
+    if (code === 77) return 'Snow.mp4'; // Snow grains
+    if (code >= 85 && code <= 86) return 'Heavy Snow.mp4'; // Snow showers
+    
+    // Thunderstorm conditions
+    if (code >= 95 && code <= 99) return 'Thunderstorm.mp4';
+    
+    // Default fallback
+    return isDay ? 'Mostly Sunny.mp4' : 'Clear Night.mp4';
   };
 
   const getWeatherDescription = (code) => {
@@ -199,7 +217,7 @@ const WeatherWidget = () => {
   if (loading) return <div className="weather-widget loading">Loading weather...</div>;
   if (error) return <div className="weather-widget error">{error}</div>;
 
-  const currentVideo = weather ? getWeatherVideo(weather.weatherCode) : 'cloudy.mp4';
+  const currentVideo = weather ? getWeatherVideo(weather.weatherCode, weather.isDay) : 'Mostly Sunny.mp4';
 
   return (
     <div className="weather-widget">

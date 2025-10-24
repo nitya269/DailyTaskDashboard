@@ -411,7 +411,7 @@ export default function TaskAssignForm({ setActivePage }) {
         <table className="task-table">
           <thead>
             <tr>
-              <th>ID</th>
+              <th>S.No</th>
               <th>Employee</th>
               <th>Project</th>
               <th>Module</th>
@@ -425,12 +425,12 @@ export default function TaskAssignForm({ setActivePage }) {
           <tbody>
             {filteredTasks.length === 0 ? (
               <tr>
-                <td colSpan="10">No tasks found</td>
+                <td colSpan="9">No tasks found</td>
               </tr>
             ) : (
-              filteredTasks.map((task) => (
+              filteredTasks.map((task, index) => (
                 <tr key={task.task_id}>
-                  <td>{task.task_id}</td>
+                  <td>{index + 1}</td>
                   <td>{task.emp_name} ({task.emp_code})</td>
                   <td>{task.project}</td>
                   <td>{task.module}</td>
