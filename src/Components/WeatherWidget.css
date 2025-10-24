@@ -741,18 +741,49 @@
   flex-shrink: 0;
 }
 
-.hourly-forecast {
+.hourly-forecast-container {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
   margin-top: 0.5rem;
+  width: 100%;
+  overflow-x: auto;
+  padding-bottom: 1rem;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+  -webkit-overflow-scrolling: touch;
+}
+
+.hourly-forecast-box {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  min-width: 300px;
+  flex: 1 0 auto;
+}
+
+.hourly-forecast-header {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0.6rem 1rem;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.hourly-forecast {
   display: flex;
   overflow-x: auto;
   overflow-y: visible;
   gap: 0.5rem;
-  padding: 1rem 0.5rem 1.5rem;
+  padding: 1rem 0.5rem;
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
   width: 100%;
   -webkit-overflow-scrolling: touch;
-  min-height: 180px;
+  min-height: 150px;
   align-items: flex-start;
   box-sizing: border-box;
   position: relative;
