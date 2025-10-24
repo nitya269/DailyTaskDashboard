@@ -53,34 +53,97 @@ const WeatherWidget = () => {
   );
   const [showHourly, setShowHourly] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState('vijayawada');
+  const [weatherCache, setWeatherCache] = useState({});
+  const [retryCount, setRetryCount] = useState(0);
+
+  // Location data with coordinates
+  const locations = {
+    vaddeswaram: {
+      name: 'Vaddeswaram (CDMA)',
+      latitude: 16.445339,
+      longitude: 80.611679,
+      timezone: 'Asia/Kolkata'
+    },
+    vijayawada: {
+      name: 'Vijayawada',
+      latitude: 16.506174,
+      longitude: 80.648018,
+      timezone: 'Asia/Kolkata'
+    },
+    rajahmundry: {
+      name: 'Rajahmundry',
+      latitude: 17.000538,
+      longitude: 81.804031,
+      timezone: 'Asia/Kolkata'
+    }
+  };
 
   const toggleForecast = () => {
     setIsExpanded(!isExpanded);
   };
 
-  const latitude = 16.5062; // Vijayawada
-  const longitude = 80.6480;
-  const timezone = 'Asia/Kolkata';
+  const handleLocationChange = (e) => {
+    setSelectedLocation(e.target.value);
+  };
+
+  const currentLocation = locations[selectedLocation];
+
+  // Create axios instance with timeout and retry
+  const weatherAPI = axios.create({
+    timeout: 10000, // 10 second timeout
+    headers: {
+      'Accept': 'application/json',
+    }
+  });
+
+  // Add request interceptor for retry logic
+  weatherAPI.interceptors.response.use(
+    (response) => response,
+    async (error) => {
+      if (error.code === 'ECONNABORTED' || error.response?.status >= 500) {
+        if (retryCount < 2) {
+          setRetryCount(prev => prev + 1);
+          await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
+          return weatherAPI.request(error.config);
+        }
+      }
+      return Promise.reject(error);
+    }
+  );
 
   useEffect(() => {
     const fetchWeather = async () => {
+      const cacheKey = `${selectedLocation}_${Math.floor(Date.now() / (10 * 60 * 1000))}`; // 10-minute cache
+      
+      // Check cache first
+      if (weatherCache[cacheKey]) {
+        const cachedData = weatherCache[cacheKey];
+        setWeather(cachedData.weather);
+        setForecast(cachedData.forecast);
+        setHourlyForecast(cachedData.hourlyForecast);
+        setLastUpdated(cachedData.lastUpdated);
+        setLoading(false);
+        setError(null);
+        return;
+      }
+
       try {
-        const [currentResponse, forecastResponse, hourlyResponse] = await Promise.all([
-          axios.get(
-            `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&timezone=${timezone}`
-          ),
-          axios.get(
-            `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_sum,windspeed_10m_max&timezone=${timezone}`
-          ),
-          axios.get(
-            `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,weathercode,precipitation_probability&timezone=${timezone}&forecast_days=2`
-          ),
-        ]);
+        setLoading(true);
+        setError(null);
+        setRetryCount(0);
 
-        const current = currentResponse.data.current_weather;
-        const daily = forecastResponse.data.daily;
+        // Single optimized API call with all required data
+        const response = await weatherAPI.get(
+          `https://api.open-meteo.com/v1/forecast?latitude=${currentLocation.latitude}&longitude=${currentLocation.longitude}&current_weather=true&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_sum,windspeed_10m_max&hourly=temperature_2m,weathercode,precipitation_probability&timezone=${currentLocation.timezone}&forecast_days=7`
+        );
 
-        // Get today's min and max temperatures directly from the API response
+        const data = response.data;
+        const current = data.current_weather;
+        const daily = data.daily;
+        const hourly = data.hourly;
+
+        // Get today's min and max temperatures
         const todayMinTemp = Math.round(daily.temperature_2m_min[0]);
         const todayMaxTemp = Math.round(daily.temperature_2m_max[0]);
 
@@ -98,7 +161,6 @@ const WeatherWidget = () => {
           windSpeed: daily.windspeed_10m_max[index + 1],
         }));
         
-        // Get next 7 days (already excluding today)
         const nextSevenDays = forecastData.slice(0, 7);
 
         const weatherData = {
@@ -115,12 +177,12 @@ const WeatherWidget = () => {
           maxTemp: todayMaxTemp
         };
 
+        // Process hourly data more efficiently
         const now = new Date();
         const currentHour = now.getHours();
         const hourlyData = [];
         
-        const hoursToShow = 24;
-        for (let i = 0; i < hoursToShow; i++) {
+        for (let i = 0; i < 24; i++) {
           const hourIndex = currentHour + i;
           const hourTime = new Date();
           hourTime.setHours(hourTime.getHours() + i);
@@ -130,36 +192,59 @@ const WeatherWidget = () => {
             hour12: true,
           }).replace(' ', '');
           
-          const dayIndex = Math.floor(hourIndex / 24);
           const hourInDay = hourIndex % 24;
           
           hourlyData.push({
             time: formattedHour,
-            temp: Math.round(hourlyResponse.data.hourly.temperature_2m[hourIndex]),
-            code: hourlyResponse.data.hourly.weathercode[hourIndex],
-            precipitation: hourlyResponse.data.hourly.precipitation_probability[hourIndex],
+            temp: Math.round(hourly.temperature_2m[hourIndex]),
+            code: hourly.weathercode[hourIndex],
+            precipitation: hourly.precipitation_probability[hourIndex],
             isDay: hourInDay >= 6 && hourInDay < 18, 
           });
         }
 
+        const processedData = {
+          weather: weatherData,
+          forecast: nextSevenDays,
+          hourlyForecast: hourlyData,
+          lastUpdated: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
+        };
+
+        // Cache the data
+        setWeatherCache(prev => ({
+          ...prev,
+          [cacheKey]: processedData
+        }));
+
         setWeather(weatherData);
         setForecast(nextSevenDays);
         setHourlyForecast(hourlyData);
-        setLastUpdated(
-          new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
-        );
+        setLastUpdated(processedData.lastUpdated);
         setLoading(false);
+        setError(null);
       } catch (err) {
         console.error('Error fetching weather data:', err);
         setError('Weather data temporarily unavailable');
         setLoading(false);
+        
+        // If we have cached data, use it as fallback
+        const fallbackKey = Object.keys(weatherCache).find(key => key.startsWith(selectedLocation));
+        if (fallbackKey && weatherCache[fallbackKey]) {
+          const fallbackData = weatherCache[fallbackKey];
+          setWeather(fallbackData.weather);
+          setForecast(fallbackData.forecast);
+          setHourlyForecast(fallbackData.hourlyForecast);
+          setLastUpdated(fallbackData.lastUpdated);
+          setError('Using cached data - Weather service unavailable');
+        }
       }
     };
 
     fetchWeather();
-    const interval = setInterval(fetchWeather, 30 * 60 * 1000);
+    // Increased interval to 60 minutes to reduce API load
+    const interval = setInterval(fetchWeather, 60 * 60 * 1000);
     return () => clearInterval(interval);
-  }, [latitude, longitude]);
+  }, [selectedLocation, currentLocation, weatherCache]);
 
   const getWeatherIcon = (code, isDay = true) => {
     if (code === 0) return isDay ? '☀️' : '🌙';
@@ -246,7 +331,7 @@ const WeatherWidget = () => {
                     {new Date().toLocaleDateString('en-IN', { weekday: 'long' })}
                   </span>
                   <span className="location">
-                    Vijayawada
+                    {currentLocation.name}
                   </span>
                 </div>
               </div>
@@ -273,6 +358,23 @@ const WeatherWidget = () => {
               </div>
             </div>
             <div className="expand-button-container">
+              <div className="location-dropdown-container">
+                <div className="location-dropdown-wrapper">
+                  <select 
+                    className="location-dropdown" 
+                    value={selectedLocation} 
+                    onChange={handleLocationChange}
+                  >
+                    <option value="" disabled>Select the location</option>
+                    {Object.entries(locations).map(([key, location]) => (
+                      <option key={key} value={key}>
+                        {location.name}
+                      </option>
+                    ))}
+                  </select>
+                  <span className="dropdown-arrow">▼</span>
+                </div>
+              </div>
               <button 
                 className="expand-button" 
                 onClick={toggleForecast}
