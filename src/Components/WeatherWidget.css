@@ -1,7 +1,7 @@
 /* Base styles */
 .weather-widget {
   background: transparent; /* Remove gradient background to show video clearly */
-  color: white;
+  color: #141313;
   border-radius: 12px;
   padding: 1rem;
   margin: 0 auto 1rem;
@@ -248,10 +248,103 @@
 /* Expand button container */
 .expand-button-container {
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-between;
+  align-items: center;
   padding: 0.3rem 0.8rem 0.5rem;
   width: 100%;
   box-sizing: border-box;
+  gap: 1rem;
+}
+
+/* Location dropdown container */
+.location-dropdown-container {
+  display: flex;
+  align-items: center;
+}
+
+/* Location dropdown wrapper */
+.location-dropdown-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+/* Location dropdown */
+.location-dropdown {
+  background: transparent !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: rgba(255, 255, 255, 0.8) !important;
+  border-radius: 4px !important;
+  padding: 0.2rem 0.8rem !important;
+  padding-right: 2rem !important;
+  font-size: 0.75rem !important;
+  font-weight: 500 !important;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  min-width: 140px !important;
+  text-align: center !important;
+  height: 26px !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  margin-top: 0.2rem !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Dropdown arrow */
+.dropdown-arrow {
+  position: absolute !important;
+  right: 0.5rem !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  color: rgba(255, 255, 255, 0.8) !important;
+  font-size: 0.75rem !important;
+  pointer-events: none !important;
+  z-index: 1 !important;
+}
+
+.location-dropdown:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: white !important;
+}
+
+.location-dropdown:hover + .dropdown-arrow {
+  color: white !important;
+}
+
+.location-dropdown:focus {
+  outline: none !important;
+  border-color: rgba(255, 255, 255, 0.4) !important;
+  box-shadow: none !important;
+}
+
+.location-dropdown option {
+  background: rgba(0, 0, 0, 0.9) !important;
+  color: white !important;
+  padding: 0.5rem !important;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+}
+
+.location-dropdown option:first-child {
+  color: #000 !important;
+  font-style: italic !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Additional dropdown styling to override browser defaults */
+select.location-dropdown {
+  background: transparent !important;
+  background-image: none !important;
+  background-color: transparent !important;
+}
+
+select.location-dropdown::-ms-expand {
+  display: none !important;
+}
+
+select.location-dropdown::-webkit-calendar-picker-indicator {
+  display: none !important;
 }
 
 /* Expand button */
