@@ -41,8 +41,11 @@ const WeatherWidget = () => {
   const [lastUpdated, setLastUpdated] = useState('');
   const [forecast, setForecast] = useState([]);
   const [hourlyForecast, setHourlyForecast] = useState(
-    Array(6).fill(null).map(() => ({
-      time: '--:--',
+    Array(24).fill(null).map((_, index) => ({
+      time: new Date(Date.now() + index * 60 * 60 * 1000).toLocaleTimeString('en-IN', {
+        hour: 'numeric',
+        hour12: true,
+      }).replace(' ', ''),
       temp: '--',
       code: 0,
       precipitation: 0,
@@ -77,22 +80,26 @@ const WeatherWidget = () => {
         const current = currentResponse.data.current_weather;
         const daily = forecastResponse.data.daily;
 
+        // Get today's min and max temperatures directly from the API response
+        const todayMinTemp = Math.round(daily.temperature_2m_min[0]);
+        const todayMaxTemp = Math.round(daily.temperature_2m_max[0]);
+
         // Get forecast for next 7 days (excluding today)
-        const forecastData = daily.time.map((date, index) => ({
+        const forecastData = daily.time.slice(1).map((date, index) => ({
           date: new Date(date).toLocaleDateString('en-IN', { 
             weekday: 'short',
             day: 'numeric',
             month: 'short' 
           }),
-          maxTemp: Math.round(daily.temperature_2m_max[index]),
-          minTemp: Math.round(daily.temperature_2m_min[index]),
-          weatherCode: daily.weathercode[index],
-          precipitation: daily.precipitation_sum[index],
-          windSpeed: daily.windspeed_10m_max[index],
+          maxTemp: Math.round(daily.temperature_2m_max[index + 1]),
+          minTemp: Math.round(daily.temperature_2m_min[index + 1]),
+          weatherCode: daily.weathercode[index + 1],
+          precipitation: daily.precipitation_sum[index + 1],
+          windSpeed: daily.windspeed_10m_max[index + 1],
         }));
         
-        // Remove today's forecast and get next 7 days
-        const nextSevenDays = forecastData.slice(1, 8); // This should give us 7 days (indices 1 through 7)
+        // Get next 7 days (already excluding today)
+        const nextSevenDays = forecastData.slice(0, 7);
 
         const weatherData = {
           temperature: current.temperature,
@@ -104,6 +111,8 @@ const WeatherWidget = () => {
             minute: '2-digit',
           }),
           isDay: current.is_day === 1,
+          minTemp: todayMinTemp,
+          maxTemp: todayMaxTemp
         };
 
         const now = new Date();
@@ -241,8 +250,12 @@ const WeatherWidget = () => {
                   </span>
                 </div>
               </div>
-              <div className="weather-item">
-                <span className="temperature">{Math.round(weather.temperature)}°C</span>
+              <div className="weather-item temperature-container">
+                <div className="temperature-main">{Math.round(weather.temperature)}°</div>
+                <div className="temperature-range">
+                  <span className="temp-max">H: {weather.maxTemp}°</span>
+                  <span className="temp-min">L: {weather.minTemp}°</span>
+                </div>
               </div>
               <div className="weather-item">
                 <div className="weather-icon">
@@ -295,11 +308,18 @@ const WeatherWidget = () => {
                     <div className="day">{day.date}</div>
                     <div className="forecast-icon">{getWeatherIcon(day.weatherCode, true)}</div>
                     <div className="forecast-temp">
-                      <span className="max-temp">{day.maxTemp}°</span>
-                      <span className="min-temp">{day.minTemp}°</span>
+                      <div className="temperature-range">
+                        <span className="temp-max">H: {day.maxTemp}°</span>
+                        <span className="temp-min">L: {day.minTemp}°</span>
+                      </div>
                     </div>
                     {day.precipitation > 0 && (
-                      <div className="precipitation">💧 {day.precipitation}mm</div>
+                      <div className="precipitation">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
+                        </svg>
+                        {day.precipitation}mm
+                      </div>
                     )}
                   </div>
                 ))
@@ -312,19 +332,32 @@ const WeatherWidget = () => {
               {hourlyForecast.length > 0 ? (
                 hourlyForecast.map((hour, index) => {
                   const currentHour = new Date().getHours();
-                  const isDay = currentHour + index >= 6 && currentHour + index < 20;
+                  const hourOfDay = (currentHour + index) % 24;
+                  const isDay = hourOfDay >= 6 && hourOfDay < 20;
+                  const isNextDay = currentHour + index >= 24;
+                  const isFirstHourOfDay = hourOfDay === 0;
+                  
                   return (
-                    <div key={index} className="hourly-item">
-                      <div className="hourly-time">{index === 0 ? 'Now' : hour.time}</div>
-                      <div className="hourly-weather">
-                        <div className="hourly-icon">{getWeatherIcon(hour.code, isDay)}</div>
-                        <div className="hourly-temp">{Math.round(hour.temp)}°</div>
-                        <div className="hourly-condition">{weatherCodes[hour.code]}</div>
-                      </div>
-                      {hour.precipitation > 0 && (
-                        <div className="hourly-precipitation">💧 {hour.precipitation}%</div>
+                    <React.Fragment key={index}>
+                      {isFirstHourOfDay && (
+                        <div className="day-divider">
+                          <span>Tomorrow</span>
+                        </div>
                       )}
-                    </div>
+                      <div className={`hourly-item ${isNextDay ? 'next-day' : ''}`}>
+                        <div className="hourly-time">
+                          {index === 0 ? 'Now' : isFirstHourOfDay ? '12 AM' : hour.time}
+                        </div>
+                        <div className="hourly-weather">
+                          <div className="hourly-icon">{getWeatherIcon(hour.code, isDay)}</div>
+                          <div className="hourly-temp">{Math.round(hour.temp)}°</div>
+                          <div className="hourly-condition">{weatherCodes[hour.code]}</div>
+                        </div>
+                        {hour.precipitation > 0 && (
+                          <div className="hourly-precipitation">💧 {hour.precipitation}%</div>
+                        )}
+                      </div>
+                    </React.Fragment>
                   );
                 })
               ) : (
