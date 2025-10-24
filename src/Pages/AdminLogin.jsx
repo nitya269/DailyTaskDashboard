@@ -159,12 +159,16 @@ export default function AdminLogin() {
     <div className="admin-login-wrapper min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-400 p-4">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 sm:p-8 transition-all duration-300">
         {/* Company Title */}
-        <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-center text-indigo-700 break-words leading-tight">
-          Dreamstep Software Solutions 
-        </h2>
-        <h4 className="text-sm sm:text-base md:text-lg text-center text-gray-600 mb-6 leading-snug break-words">
-           Employee Login – Task Management System
-       </h4>
+        <div className="mb-4 w-full">
+          <div className="text-center -ml-4">
+            <h2 className="text-[11px] sm:text-[13px] font-semibold text-indigo-700 whitespace-nowrap">
+              Dreamstep Software Solutions
+            </h2>
+            <h4 className="text-[9px] sm:text-[10px] text-gray-600 whitespace-nowrap px-1">
+              Employee Login – Task Management System
+            </h4>
+          </div>
+        </div>
 
         {/* Toggle Buttons */}
         <div className="flex justify-center mb-6">
