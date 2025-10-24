@@ -174,8 +174,8 @@ function Task(props) {
       return;
     }
     
-    const worksheetData = displayedTasks.map(task => ({
-      "Task ID": task.task_id,
+    const worksheetData = displayedTasks.map((task, index) => ({
+      "S.No": index + 1,
       "Employee Name": task.emp_name,
       "Employee Code": task.emp_code,
       "Project": task.project,
