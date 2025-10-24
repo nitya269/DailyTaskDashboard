@@ -727,11 +727,7 @@ nhanced Responsive Design for EmployeeDashboard */
   }
   
   .employee-dashboard-wrapper .task-summary-cards {
-<<<<<<< HEAD
     margin-top: 45px;
-=======
-    margin-top:45px;
->>>>>>> ec4111a3d9533a56ad0093cd1db4af2156615e0b
     grid-template-columns: repeat(4, 1fr);
     gap: 24px;
   }
