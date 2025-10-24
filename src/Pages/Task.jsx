@@ -226,8 +226,8 @@ function Task(props) {
         </div>
 
       {/* Filters */}
-      <div className="filters">
-        {props.showFilters && (
+      {props.showFilters && (
+        <div className="filters">
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 10, alignItems: "center" }}>
             <select value={filter.employee} onChange={e => setFilter({ ...filter, employee: e.target.value })}>
               <option value="">Filter by Name</option>
@@ -252,8 +252,8 @@ function Task(props) {
             <input type="text" placeholder="Search task/module/submodule" value={filter.search} onChange={e => setFilter({ ...filter, search: e.target.value })} />
             <button onClick={() => setFilter({ employee: "", project: "", status: "", fromDate: "", toDate: "", search: "" })}>Clear</button>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Tasks Table */}
       <table className="task-table">
