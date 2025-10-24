@@ -281,7 +281,12 @@ const WeatherWidget = () => {
     
     // Moderate to heavy rain
     if (code >= 61 && code <= 67) return 'Rain.mp4';
-    if (code >= 80 && code <= 82) return 'Showers.mp4'; // Rain showers
+    
+    // Slight rain showers - use specific video
+    if (code === 80) return 'slightly rainn.mp4';
+    
+    // Other rain showers
+    if (code >= 81 && code <= 82) return 'Showers.mp4';
     
     // Snow conditions
     if (code >= 71 && code <= 75) return 'Snow.mp4';
