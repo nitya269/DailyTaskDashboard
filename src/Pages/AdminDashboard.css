@@ -759,6 +759,9 @@
 }
 
 .admin-dashboard-wrapper .table-header h4 {
+  text-align: center;
+  width: 100%;
+  margin: 0 auto;
   font-size: var(--text-xl);
   font-weight: var(--font-semibold);
   color: var(--gray-900);
