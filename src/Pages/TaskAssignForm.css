@@ -176,6 +176,8 @@
 }
 
 .task-assign-form-wrapper .task-list-container h2 {
+  text-align:center;
+  width:100%;
   font-size: var(--text-2xl);
   font-weight: var(--font-bold);
   color: var(--gray-900);
