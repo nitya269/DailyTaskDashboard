@@ -304,6 +304,53 @@ const WeatherWidget = () => {
     return weatherCodes[code] || 'Unknown';
   };
 
+  // Manual refresh function
+  const refreshWeather = async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const cacheKey = `${selectedLocation}_${Math.floor(Date.now() / (10 * 60 * 1000))}`;
+      
+      // Clear cache for this location to force fresh data
+      setWeatherCache(prev => {
+        const newCache = { ...prev };
+        delete newCache[cacheKey];
+        return newCache;
+      });
+
+      const response = await weatherAPI.get(
+        `https://api.open-meteo.com/v1/forecast?latitude=${currentLocation.latitude}&longitude=${currentLocation.longitude}&current_weather=true&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_sum,windspeed_10m_max&hourly=temperature_2m,weathercode,precipitation_probability&timezone=${currentLocation.timezone}&forecast_days=7`
+      );
+
+      const processedData = {
+        weather: response.data.current_weather,
+        forecast: response.data.daily,
+        hourlyForecast: response.data.hourly,
+        lastUpdated: new Date().toLocaleString('en-IN', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true,
+        }),
+      };
+
+      setWeather(processedData.weather);
+      setForecast(processedData.forecast);
+      setHourlyForecast(processedData.hourlyForecast);
+      setLastUpdated(processedData.lastUpdated);
+      setWeatherCache(prev => ({ ...prev, [cacheKey]: processedData }));
+      setLoading(false);
+      setError(null);
+    } catch (err) {
+      console.error('Error refreshing weather:', err);
+      setError('Failed to refresh weather data');
+      setLoading(false);
+    }
+  };
+
   if (loading) return <div className="weather-widget loading">Loading weather...</div>;
   if (error) return <div className="weather-widget error">{error}</div>;
 
@@ -380,13 +427,23 @@ const WeatherWidget = () => {
                   <span className="dropdown-arrow">▼</span>
                 </div>
               </div>
-              <button 
-                className="expand-button" 
-                onClick={toggleForecast}
-                aria-label={isExpanded ? 'Collapse forecast' : 'View forecast'}
-              >
-                {isExpanded ? '▲' : '▼'} View Forecast
-              </button>
+              <div className="weather-buttons">
+                <button 
+                  className="refresh-button" 
+                  onClick={refreshWeather}
+                  disabled={loading}
+                  aria-label="Refresh weather data"
+                >
+                  {loading ? '⟳' : '↻'} Refresh
+                </button>
+                <button 
+                  className="expand-button" 
+                  onClick={toggleForecast}
+                  aria-label={isExpanded ? 'Collapse forecast' : 'View forecast'}
+                >
+                  {isExpanded ? '▲' : '▼'} View Forecast
+                </button>
+              </div>
             </div>
           </div>
 

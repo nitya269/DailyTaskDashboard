@@ -348,6 +348,43 @@ select.location-dropdown::-webkit-calendar-picker-indicator {
   display: none !important;
 }
 
+/* Weather buttons container */
+.weather-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.2rem;
+}
+
+/* Refresh button */
+.refresh-button {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.8);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0.2rem 0.8rem;
+  font-size: 0.75rem;
+  height: 26px;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  gap: 0.3rem;
+  min-width: 80px;
+}
+
+.refresh-button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.refresh-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 /* Expand button */
 .expand-button {
   background: transparent;
@@ -364,7 +401,7 @@ select.location-dropdown::-webkit-calendar-picker-indicator {
   white-space: nowrap;
   transition: all 0.2s ease;
   gap: 0.3rem;
-  margin-top: 0.2rem;
+  min-width: 140px;
 }
 
 .expand-button:hover {
