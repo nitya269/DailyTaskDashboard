@@ -86,7 +86,7 @@ const Active = ({ employees: employeesProp, tasks: tasksProp }) => {
         <table className="task-table">
           <thead>
             <tr>
-              <th>ID</th>
+              <th>S.No</th>
               <th>Employee Code</th>
               <th>Employee Name</th>
               <th>Department</th>

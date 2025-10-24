@@ -135,7 +135,18 @@ export default function AdminDashboard() {
   }, []);
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    
+    // Mobile number validation
+    if (name === 'mobile') {
+      // Only allow numbers and limit to 10 digits
+      const numericValue = value.replace(/\D/g, ''); // Remove non-numeric characters
+      if (numericValue.length <= 10) {
+        setForm({ ...form, [name]: numericValue });
+      }
+    } else {
+      setForm({ ...form, [name]: value });
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -144,6 +155,13 @@ export default function AdminDashboard() {
 
     if (!form.emp_code || !form.name || !form.email || !form.department || !form.position) {
       alert("Please fill all required fields");
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Mobile number validation
+    if (form.mobile && form.mobile.length !== 10) {
+      alert("Mobile number must be exactly 10 digits");
       setIsSubmitting(false);
       return;
     }
@@ -198,12 +216,20 @@ export default function AdminDashboard() {
     
     try {
       console.log("🗑️ Sending delete request for ID:", id);
-      await axios.delete(`http://localhost:5000/api/emp_details/${id}`);
-      fetchEmployees();
-      fetchStats();
+      const response = await axios.delete(`http://localhost:5000/api/emp_details/${id}`);
+      
+      if (response.data.success) {
+        console.log("✅ Employee deleted successfully:", response.data.message);
+        fetchEmployees();
+        fetchStats();
+      } else {
+        console.error("❌ Delete failed:", response.data.message);
+        alert(`Error: ${response.data.message}`);
+      }
     } catch (err) {
       console.error("Error deleting employee:", err);
-      alert("Error deleting employee. Please try again.");
+      const errorMessage = err.response?.data?.message || "Error deleting employee. Please try again.";
+      alert(errorMessage);
     } finally {
       setIsDeleting(prev => ({ ...prev, [id]: false }));
     }
@@ -363,7 +389,7 @@ export default function AdminDashboard() {
                 <table className="task-table">
                   <thead>
                     <tr>
-                      <th>ID</th>
+                      <th>S.No</th>
                       <th>Employee Name</th>
                       <th>Designation</th>
                       <th>Department</th>
@@ -386,8 +412,8 @@ export default function AdminDashboard() {
             )}
 
             {filterCard === "totalTasks" && <div className="tasks-wrapper"><Task taskType="totalTasks" tasks={tasks} showFilters={true} /></div>}
-            {filterCard === "pendingTasks" && <div className="tasks-wrapper"><Task taskType="pendingTasks" tasks={tasks} showFilters={true} /></div>}
-            {filterCard === "completedTasks" && <div className="tasks-wrapper"><Task taskType="completedTasks" tasks={tasks} showFilters={true} /></div>}
+            {filterCard === "pendingTasks" && <div className="tasks-wrapper"><Task taskType="pendingTasks" tasks={tasks} showFilters={false} /></div>}
+            {filterCard === "completedTasks" && <div className="tasks-wrapper"><Task taskType="completedTasks" tasks={tasks} showFilters={false} /></div>}
             {filterCard === "activeEmployees" && <div className="active-employees-wrapper"><Active employees={employees} tasks={tasks} /></div>}
           </div>
         )}
@@ -431,7 +457,7 @@ export default function AdminDashboard() {
                   </div>
                   <div className="form-field">
                     <label>Mobile</label>
-                    <input type="text" name="mobile" placeholder="Enter mobile number" value={form.mobile} onChange={handleChange} required disabled={isSubmitting} />
+                    <input type="tel" name="mobile" placeholder="Enter 10-digit mobile number" value={form.mobile} onChange={handleChange} maxLength="10" required disabled={isSubmitting} />
                   </div>
                 </div>
                 <div className="form-row">
@@ -457,6 +483,7 @@ export default function AdminDashboard() {
               <table className="employee-table">
                 <thead>
                   <tr>
+                    <th>S.No</th>
                     <th>Employee Code</th>
                     <th>Name</th>
                     <th>Email</th>
@@ -470,6 +497,7 @@ export default function AdminDashboard() {
                 <tbody>
                   {employees.map((emp, index) => (
                     <tr key={emp.id || emp.emp_code || `emp-${index}`}>
+                      <td>{index + 1}</td>
                       <td>{emp.emp_code}</td>
                       <td>{emp.name}</td>
                       <td>{emp.email}</td>

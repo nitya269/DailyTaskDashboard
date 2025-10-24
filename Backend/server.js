@@ -226,10 +226,26 @@ app.get("/api/emp_details", async (req, res) => {
 app.delete("/api/emp_details/:id", async (req, res) => {
   try {
     const { id } = req.params;
+    
+    // First, get the employee's emp_code before deletion
+    const empResult = await pool.query("SELECT emp_code FROM emp_details WHERE id = $1", [id]);
+    
+    if (empResult.rows.length === 0) {
+      return res.status(404).json({ success: false, message: "Employee not found" });
+    }
+    
+    const empCode = empResult.rows[0].emp_code;
+    
+    // Delete all tasks associated with this employee first
+    await pool.query("DELETE FROM task_details WHERE emp_code = $1", [empCode]);
+    
+    // Then delete the employee
     await pool.query("DELETE FROM emp_details WHERE id = $1", [id]);
-    res.json({ message: "Employee deleted" });
+    
+    res.json({ success: true, message: "Employee and associated tasks deleted successfully" });
   } catch (err) {
-    res.status(500).send(err.message);
+    console.error("Error deleting employee:", err);
+    res.status(500).json({ success: false, message: "Server error", error: err.message });
   }
 });
 

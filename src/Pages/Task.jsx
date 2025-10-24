@@ -264,7 +264,7 @@ function Task(props) {
       <table className="task-table">
         <thead>
           <tr>
-            <th>ID</th>
+            <th>S.No</th>
             <th>Employee</th>
             <th>Project</th>
             <th>Module</th>
@@ -283,9 +283,9 @@ function Task(props) {
               </td>
             </tr>
           ) : (
-            displayedTasks.map((task) => (
+            displayedTasks.map((task, index) => (
               <tr key={task.task_id}>
-                <td>{task.task_id}</td>
+                <td>{index + 1}</td>
                 <td>
                   {task.emp_name} ({task.emp_code})
                 </td>
