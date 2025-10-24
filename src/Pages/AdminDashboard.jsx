@@ -31,6 +31,21 @@ export default function AdminDashboard() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState({});
 
+  // Date formatting function to convert ISO date to DD-MM-YYYY format
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    try {
+      const date = new Date(dateString);
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      return `${day}-${month}-${year}`;
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return dateString; // Return original string if formatting fails
+    }
+  };
+
   const [form, setForm] = useState({
     id: "",
     emp_code: "",
@@ -504,7 +519,7 @@ export default function AdminDashboard() {
                       <td>{emp.department}</td>
                       <td>{emp.position}</td>
                       <td>{emp.mobile}</td>
-                      <td>{emp.date_of_joining}</td>  
+                      <td>{formatDate(emp.date_of_joining)}</td>  
                       <td>
                         <button 
                           className="delete-btn" 

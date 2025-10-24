@@ -21,8 +21,14 @@ function EmployeeDashboard() {
   const TZ = "Asia/Kolkata";
   const formatISTDate = (dateLike) =>
     new Intl.DateTimeFormat("en-IN", { year: "numeric", month: "2-digit", day: "2-digit", timeZone: TZ }).format(new Date(dateLike));
-  const formatISTDateTime = (dateLike) =>
-    new Intl.DateTimeFormat("en-IN", { dateStyle: "medium", timeStyle: "short", timeZone: TZ }).format(new Date(dateLike));
+  const formatISTDateTime = (dateLike) => {
+    const date = new Date(dateLike);
+    const istDate = new Date(date.getTime() + 5.5 * 60 * 60 * 1000);
+    const day = String(istDate.getDate()).padStart(2, '0');
+    const month = String(istDate.getMonth() + 1).padStart(2, '0');
+    const year = istDate.getFullYear();
+    return `${day}-${month}-${year}`;
+  };
   const getISTYMD = (dateLike) => {
     const parts = new Intl.DateTimeFormat("en-GB", {
       timeZone: TZ,

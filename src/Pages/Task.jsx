@@ -139,20 +139,15 @@ function Task(props) {
     setFilteredTasks(result);
   }, [filter, tasks]);
 
-  // Convert UTC to IST
+  // Convert UTC to IST and format as DD-MM-YYYY
   const formatToIST = (dateString) => {
     if (!dateString) return "-";
     const date = new Date(dateString);
     const istDate = new Date(date.getTime() + 5.5 * 60 * 60 * 1000);
-    return istDate.toLocaleString("en-IN", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: true
-    });
+    const day = String(istDate.getDate()).padStart(2, '0');
+    const month = String(istDate.getMonth() + 1).padStart(2, '0');
+    const year = istDate.getFullYear();
+    return `${day}-${month}-${year}`;
   };
 
   const pendingTasks = tasks.filter(task => task.status === "Pending");
